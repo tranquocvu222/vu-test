@@ -1,0 +1,11 @@
+
+${AnsiColor.GREEN}██████╗ ███╗   ███╗████████╗${AnsiColor.CYAN}     █████╗ ██╗   ██╗ ██████╗████████╗██╗ ██████╗ ███╗   ██╗
+${AnsiColor.GREEN}██╔══██╗████╗ ████║╚══██╔══╝${AnsiColor.CYAN}    ██╔══██╗██║   ██║██╔════╝╚══██╔══╝██║██╔═══██╗████╗  ██║
+${AnsiColor.GREEN}██████╔╝██╔████╔██║   ██║   ${AnsiColor.CYAN}    ███████║██║   ██║██║        ██║   ██║██║   ██║██╔██╗ ██║
+${AnsiColor.GREEN}██╔══██╗██║╚██╔╝██║   ██║   ${AnsiColor.CYAN}    ██╔══██║██║   ██║██║        ██║   ██║██║   ██║██║╚██╗██║
+${AnsiColor.GREEN}██║  ██║██║ ╚═╝ ██║   ██║   ${AnsiColor.CYAN}    ██║  ██║╚██████╔╝╚██████╗   ██║   ██║╚██████╔╝██║ ╚████║
+${AnsiColor.GREEN}╚═╝  ╚═╝╚═╝     ╚═╝   ╚═╝   ${AnsiColor.CYAN}    ╚═╝  ╚═╝ ╚═════╝  ╚═════╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝
+${AnsiColor.GREEN}                            ${AnsiColor.CYAN}
+
+
+${AnsiColor.BRIGHT_BLUE}:: Running Spring Boot ${spring-boot.version} ::
