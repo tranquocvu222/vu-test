@@ -17,7 +17,7 @@ import java.util.Objects;
 
 @Slf4j
 @RequiredArgsConstructor
-public class    JWTFilter
+public class JWTFilter
     extends GenericFilterBean {
 
     private final TokenProvider tokenProvider;
@@ -30,7 +30,7 @@ public class    JWTFilter
 
         String jwtToken = tokenProvider.resolveToken(request);
 
-        var authentication = tokenProvider.validateAndGetAuthentication(jwtToken);
+        var authentication = tokenProvider.getAuthentication(jwtToken);
 
         if (StringUtils.hasText(jwtToken) && Objects.nonNull(authentication)) {
             SecurityContextHolder.getContext().setAuthentication(authentication);
