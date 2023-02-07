@@ -114,13 +114,12 @@ repositories {
     mavenLocal()
     mavenCentral()
 
+    //TODO input to environment variable
     maven {
-        //TODO Change URL and remove allowInsecureProtocol later
-        url "http://localhost:8081/repository/maven-releases/"
-        allowInsecureProtocol = true
+        url 'https://rmt-469059878066.d.codeartifact.ap-southeast-1.amazonaws.com/maven/rmt-repository/'
         credentials {
-            username ""
-            password ""
+            username "aws"
+            password "eyJ2ZXIiOjEsImlzdSI6MTY3NTcyODcyMiwiZW5jIjoiQTEyOEdDTSIsInRhZyI6IjUzRVNkNGRjTUdkWHNnUkZkY3h4TFEiLCJleHAiOjE2NzU3NzE5MjIsImFsZyI6IkExMjhHQ01LVyIsIml2IjoiYWlfeldFcklNbjBobXpGcCJ9.zJ9CUZE9QsJoARobHDEaeA.--0uLM0q3Igk-_m8.oeqAtDYDMASK-ji4H0dhps3YthGI6AhW7lZDH-S-NZtHhlwWCJITTczDHHQjOpo5clubhzx7ZNI6XQXGJEf4lsr6sCxgP9wMjdNfsFp1mrurMLUZ3930PzvBfCruQE_dtuRlaWD2Szl4USah7q_fc2wztza6XxSrbwjV_ysptLK1rV2ZjrcYc75Dnqgg8r4zo0ybVw3fKIsKD-3asnOispx0lseVLZdaJwgIr27I6Cuke3rdAsoOCBoxvBo3PCoNHa8KU0uh7Tnu1Q9m2SpSLezJJ0xzGF81GcLhtnu4ikdHwnpimDO6H4I_R026pRbmejyJ8KIWOYgW5RnwNUPh_RwzGJROLsej8ZFIBr3EzdQQL2JTeGYk557Gbf3BAtI_rASZEAdWWoVPxkdisPPRJNzh_i35QU2Bx9nUi3wSrdfLWx--wR75E3yoDrtMpNoWIUN9vggxyL6W4ZW9N1B0byJihY9bT8iQ-tvxru86t8yRWCuaodLCJskbNzuJL7rBu4PsZGduXypi9vXiVXNgy4rTTMoTGC_Y280bigt_IKJ8EwivnX3z_govdXiIyBHDzRG5p6DIwFA463Sw6g2ZbVyyv9eBeXATfSyze-XJlsR0zkzI_mihS4w00iPYJNZJRkcKjTDhlvD2C4sSOVNyHc8XYID-PZgJjHyLTq9y_DYL7lF5dqP7yUJKNCaAlP8xEkMYLOOaUqelA7jgI5m34kO68R_wInKT__OXJ-KumijpnvI3hXvlvQGFMQUM1LlcjFshX2cKefipSnMy5x8tUNPfdeCU6KrYqQbVjFgg1pAvQF8YLV5a9sQ5U-njqwTOjM_Ep9AGibN-YkIvrum7sUBB0Y6VuR_J2AiOr58AqYaYrOQFSmYyvTna28w5pEFMCb1mtp4i7vL-94bmdYOKTtDrkCB9XKPfwsynfH7rAhfV5nKd3kznMngyHgBK_Ml6zZETYA.N_H85n-ZK1elh3-YMsn8Cw"
         }
     }
 }
@@ -173,11 +172,11 @@ dependencies {
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
     implementation "org.springframework.boot:spring-boot-starter-webflux"
 
-    implementation "com.nals.rmt-common-messages:rmt-common-messages:${rmtCommonMessagesVersion}"
-    annotationProcessor "com.nals.rmt-common-messages:rmt-common-messages:${rmtCommonMessagesVersion}"
+    implementation 'com.nals:rmt-common-messages:1.0'
+    annotationProcessor 'com.nals:rmt-common-messages:1.0'
 
-    implementation "com.nals.rmt-common-utils:rmt-common-utils:${rmtCommonUtilsVersion}"
-    annotationProcessor "com.nals.rmt-common-utils:rmt-common-utils:${rmtCommonUtilsVersion}"
+    implementation 'com.nals:rmt-common-utils:1.0'
+    annotationProcessor 'com.nals:rmt-common-utils:1.0'
 
     liquibaseRuntime "mysql:mysql-connector-java"
     liquibaseRuntime "org.liquibase:liquibase-core"
