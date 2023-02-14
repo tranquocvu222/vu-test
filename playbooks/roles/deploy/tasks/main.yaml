@@ -1,0 +1,2 @@
+- include_tasks: dev-deploy.yaml
+  when: env == "dev" or env == 'qa'

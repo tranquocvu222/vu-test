@@ -1,0 +1,2 @@
+[rmt-servers]
+rmt-server ansible_ssh_host=172.31.33.160 ansible_ssh_port=22 ansible_ssh_user=dev ansible_ssh_private_key_file=/home/ec2-user/.ssh/id_rsa
