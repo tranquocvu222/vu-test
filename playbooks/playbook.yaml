@@ -1,0 +1,6 @@
+---
+- hosts: rmt-server
+  gather_facts: true
+  roles:
+    - deploy
+
