@@ -39,4 +39,8 @@ public class Company
     @ToString.Exclude
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
     private Set<Product> products;
+
+    @ToString.Exclude
+    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
+    private Set<Auction> auctions;
 }
