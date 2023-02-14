@@ -1,220 +1,65 @@
-buildscript {
-    repositories {
-        mavenLocal()
-        mavenCentral()
-
-        maven {
-            //TODO Change URL and remove allowInsecureProtocol later
-            url "http://localhost:8081/repository/maven-releases/"
-            allowInsecureProtocol = true
-            credentials {
-                username ""
-                password ""
-            }
-        }
-    }
-}
-
 plugins {
-    id "java"
-    id "application"
-    id "jacoco"
-    id "org.springframework.boot" version "2.6.6"
-    id "io.spring.dependency-management" version "1.0.15.RELEASE"
-    id "org.liquibase.gradle"
-    id "checkstyle"
+    id 'java'
+    id 'maven-publish'
+    id 'org.springframework.boot' version '2.6.6'
+    id 'io.spring.dependency-management' version '1.0.15.RELEASE'
 }
 
-group = "com.nals.rmt-auction"
-version = "0.0.1"
-description = "rmt-auction"
-
-sourceCompatibility = 11
-targetCompatibility = 11
-assert System.properties["java.specification.version"] == "11"
-
-
-if (project.hasProperty("prod") || project.hasProperty("gae")) {
-    apply from: "gradle/profile_prod.gradle"
-} else {
-    apply from: "gradle/profile_dev.gradle"
-}
-
-defaultTasks "bootRun"
-
-application {
-    mainClass = "com.nals.auction.RmtAuctionApp"
-}
-
-jar {
-    enabled = false
-}
-
-test {
-    exclude "**/CucumberTest*"
-    reports.html.required = true
-    testLogging {
-        events = ["PASSED", "SKIPPED", "FAILED"]
-        exceptionFormat = 'full'
-    }
-}
-
-check.dependsOn test
-task testReport(type: TestReport) {
-    destinationDir = file("$buildDir/reports/tests")
-    reportOn test
-}
-
-if (!project.hasProperty("runList")) {
-    project.ext.runList = "main"
-}
-
-project.ext.diffChangelogFile = "src/main/resources/config/liquibase/changelog/" + new Date().format("yyyyMMddHHmmss") + "_changelog.xml"
-
-liquibase {
-    activities {
-        main {
-            driver "com.mysql.cj.jdbc.Driver"
-            url "jdbc:mysql://localhost:3306/rmt-auction"
-            username "root"
-            password "r00t"
-            changeLogFile "src/main/resources/config/liquibase/master.xml"
-            defaultSchemaName "orm-auction"
-            logLevel "debug"
-            classpath "src/main/resources/"
-        }
-        diffLog {
-            driver "com.mysql.cj.jdbc.Driver"
-            url "jdbc:mysql://localhost:3306/auction"
-            username "root"
-            password "r00t"
-            changeLogFile project.ext.diffChangelogFile
-            referenceUrl "hibernate:spring:com.nals.auction.domain?dialect=org.hibernate.dialect.MySQL8Dialect&hibernate.physical_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy&hibernate.implicit_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy"
-            defaultSchemaName "auction"
-            logLevel "debug"
-            classpath "$buildDir/classes/java/main"
-        }
-    }
-
-    runList = project.ext.runList
-}
-
-checkstyle {
-    configFile = file("${project.rootDir}/config/checkstyle/checkstyle.xml")
-    configProperties = ["suppressionFile": project(":").file("config/checkstyle/suppressions.xml")]
-    toolVersion = "${checkstyleVersion}"
-}
+group = 'com.nals'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
 
 configurations {
-    providedRuntime
-    implementation.exclude module: "spring-boot-starter-tomcat"
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
 }
 
 repositories {
     mavenLocal()
     mavenCentral()
-
-    //TODO input to environment variable
+    gradlePluginPortal()
     maven {
         url 'https://rmt-469059878066.d.codeartifact.ap-southeast-1.amazonaws.com/maven/rmt-repository/'
         credentials {
             username "aws"
-            password "eyJ2ZXIiOjEsImlzdSI6MTY3NTcyODcyMiwiZW5jIjoiQTEyOEdDTSIsInRhZyI6IjUzRVNkNGRjTUdkWHNnUkZkY3h4TFEiLCJleHAiOjE2NzU3NzE5MjIsImFsZyI6IkExMjhHQ01LVyIsIml2IjoiYWlfeldFcklNbjBobXpGcCJ9.zJ9CUZE9QsJoARobHDEaeA.--0uLM0q3Igk-_m8.oeqAtDYDMASK-ji4H0dhps3YthGI6AhW7lZDH-S-NZtHhlwWCJITTczDHHQjOpo5clubhzx7ZNI6XQXGJEf4lsr6sCxgP9wMjdNfsFp1mrurMLUZ3930PzvBfCruQE_dtuRlaWD2Szl4USah7q_fc2wztza6XxSrbwjV_ysptLK1rV2ZjrcYc75Dnqgg8r4zo0ybVw3fKIsKD-3asnOispx0lseVLZdaJwgIr27I6Cuke3rdAsoOCBoxvBo3PCoNHa8KU0uh7Tnu1Q9m2SpSLezJJ0xzGF81GcLhtnu4ikdHwnpimDO6H4I_R026pRbmejyJ8KIWOYgW5RnwNUPh_RwzGJROLsej8ZFIBr3EzdQQL2JTeGYk557Gbf3BAtI_rASZEAdWWoVPxkdisPPRJNzh_i35QU2Bx9nUi3wSrdfLWx--wR75E3yoDrtMpNoWIUN9vggxyL6W4ZW9N1B0byJihY9bT8iQ-tvxru86t8yRWCuaodLCJskbNzuJL7rBu4PsZGduXypi9vXiVXNgy4rTTMoTGC_Y280bigt_IKJ8EwivnX3z_govdXiIyBHDzRG5p6DIwFA463Sw6g2ZbVyyv9eBeXATfSyze-XJlsR0zkzI_mihS4w00iPYJNZJRkcKjTDhlvD2C4sSOVNyHc8XYID-PZgJjHyLTq9y_DYL7lF5dqP7yUJKNCaAlP8xEkMYLOOaUqelA7jgI5m34kO68R_wInKT__OXJ-KumijpnvI3hXvlvQGFMQUM1LlcjFshX2cKefipSnMy5x8tUNPfdeCU6KrYqQbVjFgg1pAvQF8YLV5a9sQ5U-njqwTOjM_Ep9AGibN-YkIvrum7sUBB0Y6VuR_J2AiOr58AqYaYrOQFSmYyvTna28w5pEFMCb1mtp4i7vL-94bmdYOKTtDrkCB9XKPfwsynfH7rAhfV5nKd3kznMngyHgBK_Ml6zZETYA.N_H85n-ZK1elh3-YMsn8Cw"
+            password "eyJ2ZXIiOjEsImlzdSI6MTY3NjMzOTQ4MiwiZW5jIjoiQTEyOEdDTSIsInRhZyI6InEwZEcwUEl5Vi1iTGt0MkhjRkF0aFEiLCJleHAiOjE2NzYzODI2ODIsImFsZyI6IkExMjhHQ01LVyIsIml2Ijoiak9jWGh0MHlxSGE4SWhnSyJ9.dNGX8bjEsKMK5ZDRWGdegg.NbpgL0xvLDLW9aoQ.3XZjC3BjE5gl1_L3KNtonDvq8KG9-42Qvm6rRW43Zvy4N2qTTc0bEPULw20rRGHIvoXs-dZ61DcAq2WhdyYonu-fYsxymawdH9T74vXMMhodVjHJcubRwTACuetp742JyrCb0mNliyi6Eb7g1MUPm-QNe1tWgn6HxMS9KxTlshIPWSYN2yJlN-0gxSUjm7gBdBN5Lr4-U-ZDqiNiLmcEc4aliPUbnOME75wnT_DjEd9n2bsF6UcNJz-qoEbTeVOOONOyktxBeBysYhN0UEYL3kGbuiZxSW5rHp9iKidfdibUDkewFQA2nn30tqPnAgBgA_51cLzW3rZLkplCx0l9rjMyKO-e2bMn_QXUBYL4onLHLfwBpMaKROcjI0xwEvMwblN2R9X4CjTh8ZOAhC1pwLbZzNf9Kye2ArmEz4NwdsaIPQSbV6fDHZDRyOZ0bcTGAOpFJPUcAF6u7tEBmHiNepRrXjDp8W7aqMhEAgnNIBEzahVmV16-n3KokXF9YWYl4m6ru7c3e6ApVN84OnICNY9s77BCWdbWe1ECj8jN_yJJh_SaaFxrALqSRzxNnNFxRcXjuEO8MCxssMy9eqvBKXe6ZJ78lQbdNJGUuBqTIUBiTKLmYkErA1TBHLvQcC8N2NzHDrH5cX11XJnwrCD4acnUjg2-knkRDAtZz2U-4RvTQXltK5j7D1oOkSSXqcXUPvIKdMRrmxhfdciXFVef3_sohCoAy9dNCsaCnU-MRA1nVZx-v-Y-Ay5BVdeOaHpcnGRJdBm6bDJWhkdhADloT9WQKy4PAKkzPxB2BZeqxkXX3PJaRLwoxUeKFXaEJOR786-k84qJ0gnDLXFy17oUEqRexB3dMIs9SVLTqyJsuwQv97V7rNeDuDPW8lUjaYf0uZwc9kMxzgoieHwIhLFcHayZT-FVWNtsMEAJ3VCS7XWm3hHxcQs6-6XB2JrDAYZGorc7p-kuYQ.Ow-ImNX4-aZTRdCdx_lv8Q"
         }
     }
 }
 
 dependencies {
-    if (!project.hasProperty("gae")) {
-        implementation platform("tech.jhipster:jhipster-dependencies:${jhipsterDependenciesVersion}")
-    }
-
-    implementation "tech.jhipster:jhipster-framework"
-
-    implementation "com.fasterxml.jackson.module:jackson-module-afterburner"
-    implementation "javax.annotation:javax.annotation-api"
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation "org.apache.commons:commons-lang3"
-    implementation "org.apache.commons:commons-collections4:${collections4Version}"
-    implementation "org.hibernate:hibernate-core"
-    implementation "org.hibernate:hibernate-envers"
-    implementation "org.hibernate:hibernate-entitymanager"
-    implementation "org.hibernate.validator:hibernate-validator"
-    implementation "org.liquibase:liquibase-core"
-
-    implementation "org.springframework.boot:spring-boot-loader-tools"
-    implementation "org.springframework.boot:spring-boot-starter-mail"
-    implementation "org.springframework.boot:spring-boot-starter-logging"
-    implementation "org.springframework.boot:spring-boot-starter-actuator"
-    implementation "org.springframework.boot:spring-boot-starter-data-jpa"
-    implementation "org.springframework.boot:spring-boot-starter-security"
-    implementation "org.springframework.boot:spring-boot-starter-undertow"
-    implementation "org.springframework.boot:spring-boot-starter-thymeleaf"
-    implementation("org.springframework.boot:spring-boot-starter-web") {
-        exclude module: "spring-boot-starter-tomcat"
-    }
-    implementation "org.springframework.security:spring-security-config"
-    implementation "org.springframework.security:spring-security-data"
-    implementation "org.springframework.security:spring-security-web"
-
+    implementation "org.apache.httpcomponents:httpclient"
+    implementation "com.google.guava:guava:${guavaVersion}"
+    implementation "tech.jhipster:jhipster-dependencies:${jhipsterDependenciesVersion}"
     implementation "io.jsonwebtoken:jjwt-api"
     implementation "io.jsonwebtoken:jjwt-impl"
     implementation "io.jsonwebtoken:jjwt-jackson"
-    implementation "io.springfox:springfox-oas:${springfoxOasVersion}"
-    implementation "io.springfox:springfox-swagger2:${springfoxSwagger2Version}"
-    implementation "io.springfox:springfox-bean-validators:${springfoxBeanValidatorsVersion}"
-    implementation "mysql:mysql-connector-java"
-    implementation "org.apache.httpcomponents:httpclient"
-    implementation "org.zalando:problem-spring-web:${zalandoProblemSpringWebVersion}"
-    implementation "org.mapstruct:mapstruct:${mapstructVersion}"
-    implementation "com.google.guava:guava:${guavaVersion}"
-    implementation "org.apache.commons:commons-math:${mathVersion}"
-    implementation("org.springdoc:springdoc-openapi-webmvc-core")
-    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
-    implementation "org.springframework.boot:spring-boot-starter-webflux"
+    implementation "tech.jhipster:jhipster-framework"
+    implementation platform("tech.jhipster:jhipster-dependencies:${jhipsterDependenciesVersion}")
 
-    implementation 'com.nals:rmt-common-messages:1.0'
-    annotationProcessor 'com.nals:rmt-common-messages:1.0'
+    implementation "com.nals:rmt-common-messages:${commonMessageVersion}"
+    annotationProcessor "com.nals:rmt-common-messages:${commonMessageVersion}"
+    implementation "com.nals:rmt-common-utils:${commonUtilsVersion}"
+    annotationProcessor "com.nals:rmt-common-utils:${commonUtilsVersion}"
 
-    implementation 'com.nals:rmt-common-utils:1.0'
-    annotationProcessor 'com.nals:rmt-common-utils:1.0'
-
-    liquibaseRuntime "mysql:mysql-connector-java"
-    liquibaseRuntime "org.liquibase:liquibase-core"
-    liquibaseRuntime "org.liquibase.ext:liquibase-hibernate5:${liquibaseHibernate5Version}"
-    liquibaseRuntime sourceSets.main.compileClasspath
-
-    annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
-    annotationProcessor "org.hibernate:hibernate-jpamodelgen:${hibernateVersion}"
-    annotationProcessor "org.glassfish.jaxb:jaxb-runtime:${jaxbRuntimeVersion}"
-    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor:${springBootVersion}") {
-        exclude group: "com.vaadin.external.google", module: "android-json"
-    }
-
-    compileOnly "org.projectlombok:lombok:${lombokVersion}"
-    testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-    testImplementation "org.projectlombok:lombok:${lombokVersion}"
-    testImplementation "com.tobedevoured.modelcitizen:core:${modelCitizenVersion}"
-    testImplementation("com.github.javafaker:javafaker:${fakerVersion}") {
-        exclude module: 'snakeyaml'
-    }
-    testImplementation "com.h2database:h2"
-    testImplementation "org.springframework.boot:spring-boot-starter-test"
-    testImplementation "org.springframework.security:spring-security-test"
-    testImplementation "org.springframework.boot:spring-boot-test"
-    testImplementation "com.tngtech.archunit:archunit-junit5-api:${archunitJunit5Version}"
-    testRuntimeOnly "com.tngtech.archunit:archunit-junit5-engine:${archunitJunit5Version}"
-    developmentOnly "org.springframework.boot:spring-boot-devtools:${springBootVersion}"
+    compileOnly("javax.servlet:javax.servlet-api:${javaxServletVersion}")
+    compileOnly 'org.projectlombok:lombok'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    runtimeOnly 'org.postgresql:postgresql'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
 }
 
-task cleanResources(type: Delete) {
-    delete "build/resources"
+tasks.named('test') {
+    useJUnitPlatform()
 }
-
-wrapper {
-    gradleVersion = "7.4.2"
-}
-
-compileJava.dependsOn processResources
-processResources.dependsOn cleanResources, bootBuildInfo
-bootBuildInfo.mustRunAfter cleanResources
