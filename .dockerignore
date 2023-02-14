@@ -1,8 +1,0 @@
-build
-out
-.gradle
-.git
-.idea
-*.log
-*.md
-.gitignore

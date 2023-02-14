@@ -1,0 +1,28 @@
+server:
+  port: 8083
+
+spring:
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:postgresql://localhost:5432/postgres?currentSchema=test
+    username: postgres
+    password: postgres
+    validation-query: SELECT 1
+    hikari:
+      poolName: Hikari
+      auto-commit: false
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQL95Dialect
+    show-sql: true
+    hibernate:
+      ddl-auto: validate
+    database: POSTGRESQL
+
+#config using by common lib
+error:
+  path: classpath:i18n/error_messages
+jhipster:
+  security:
+    authentication:
+      jwt:
+        base64-secret: ${JWT_BASE64_SECRET:QnP/dJWnqc9AYMokt8yPjUqDNSPKk/yS+AFy4D0LZMy2BXAC4uGSXzk2x+P11uly5WYXSRQ5qvDboHXaf+pjyw==}
