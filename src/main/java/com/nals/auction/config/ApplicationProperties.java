@@ -4,6 +4,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Properties specific to RMT Auction
  * <p>
@@ -15,7 +18,14 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "application", ignoreUnknownFields = false)
 public class ApplicationProperties {
 
-    private String timezone;
-    private String serviceName;
-    private String uaaBaseUri;
+    private FileUpload fileUpload;
+    private String masterDataUrl;
+    private String uaaUrl;
+
+    @Getter
+    @Setter
+    public static class FileUpload {
+        private int maxSizeAllow = 10240;
+        private Set<String> allowExtensions = new HashSet<>();
+    }
 }

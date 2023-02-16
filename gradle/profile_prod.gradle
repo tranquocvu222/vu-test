@@ -3,9 +3,7 @@ dependencies {
 }
 
 def profiles = "prod"
-if (project.hasProperty("no-liquibase")) {
-    profiles += ",no-liquibase"
-}
+
 
 springBoot {
     buildInfo()
