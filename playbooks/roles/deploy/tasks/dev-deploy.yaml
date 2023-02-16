@@ -27,12 +27,19 @@
     regexp: '^DB_SCHEMA='
     line: DB_SCHEMA={{ DB_SCHEMA }}
 
+- name: Fetch codeartifact token
+  command: 'aws codeartifact get-authorization-token --domain rmt-dev --domain-owner 430334909132 --region us-east-2 --query authorizationToken --output text'
+  register: codeartifact_token
+  no_log: true
+  
 - name: Build image using cache source
   docker_image:
     name: "{{ repos }}"
     tag: latest
     build:
       path: "{{ application_path }}"
+      args:
+        CODEARTIFACT_AUTH_TOKEN: "{{ codeartifact_token.stdout | trim }}"      
       cache_from:
         - gradle:7.3.3-jdk11
         - openjdk:11.0.13-jre-slim      
