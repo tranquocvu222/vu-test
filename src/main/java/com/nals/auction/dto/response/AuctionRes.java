@@ -31,11 +31,14 @@ public class AuctionRes {
     private Long quantity;
     private AuctionStatus status;
     private DeliveryDateType deliveryDateType;
+    private String deliveryDateValue;
     private PaymentMethod paymentMethod;
+    private String paymentMethodValue;
     private String prefectureNameEn;
     private String prefectureNameJa;
     private String certificateNumber;
     private TradingDeadlineType tradingDeadlineType;
+    private String tradingDeadlineValue;
     private LogisticsArrangementType logisticsArrangementType;
     private ProductRes product;
     private List<MediaRes> images;

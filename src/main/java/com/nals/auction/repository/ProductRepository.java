@@ -8,9 +8,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface ProductRepository
     extends JpaRepository<Product, Long> {
+
+    Optional<Product> getProductByIdAndCompanyId(Long id, Long companyId);
 
     @Query("SELECT DISTINCT new Product(p.id, p.name, p.varietyName, p.prefectureId, p.productionYear,"
         + "                             p.certificateNumber, p.moisture, m.name)"

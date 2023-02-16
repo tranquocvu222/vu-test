@@ -13,9 +13,10 @@ public interface AuctionRepository
     extends JpaRepository<Auction, Long> {
 
     @Query("SELECT new Auction(a.id, a.startTime, a.endTime, a.startPrice, a.quantity, a.status, a.deliveryDateType,"
-        + "                    a.tradingDeadlineType, a.paymentMethod, a.prefectureId, a.logisticsArrangementType,"
-        + "                    a.certificate, p.id, p.name, p.specialCultivationMethod, p.organicJasMethod,"
-        + "                    p.noPesticidesMethod, p.otherProductionMethod)"
+        + "                    a.deliveryDateValue, a.tradingDeadlineType, a.tradingDeadlineValue, a.paymentMethod,"
+        + "                    a.paymentMethodValue, a.prefectureId, a.logisticsArrangementType, a.certificate, p.id,"
+        + "                    p.name, p.specialCultivationMethod, p.organicJasMethod, p.noPesticidesMethod,"
+        + "                    p.otherProductionMethod)"
         + " FROM Auction a"
         + " JOIN Product p ON p.id = a.product.id"
         + " WHERE a.userId = :userId"
