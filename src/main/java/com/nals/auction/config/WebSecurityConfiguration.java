@@ -69,10 +69,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .expressionHandler(new CustomDefaultWebSecurityExpressionHandler())
-                .antMatchers("/api/**/auctions/su/**")
-                .hasAnyRole(ROLE_ADMIN)
-                .antMatchers("/api/**")
-                .authenticated()
+                .antMatchers("/api/**/auctions/su/**").hasAnyRole(ROLE_ADMIN)
+                .antMatchers("/api/**").authenticated()
                 .and()
                 .apply(securityConfigurerAdapter());
         // @formatter:on

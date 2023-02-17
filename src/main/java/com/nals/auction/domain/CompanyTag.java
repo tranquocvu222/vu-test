@@ -1,7 +1,6 @@
 package com.nals.auction.domain;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -27,7 +26,7 @@ import javax.persistence.Table;
 @AllArgsConstructor
 @Table(name = "company_tags")
 public class CompanyTag
-    extends AbstractAuditingEntity{
+    extends AbstractAuditingEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

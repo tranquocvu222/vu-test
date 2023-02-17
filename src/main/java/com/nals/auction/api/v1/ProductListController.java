@@ -14,7 +14,7 @@ public class ProductListController
 
     private final ProductListBloc productListBloc;
 
-    public ProductListController(final Validator validator,final ProductListBloc productListBloc) {
+    public ProductListController(final Validator validator, final ProductListBloc productListBloc) {
         super(validator);
         this.productListBloc = productListBloc;
     }

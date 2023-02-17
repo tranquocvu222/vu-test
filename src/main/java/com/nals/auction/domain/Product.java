@@ -17,9 +17,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+
 import java.time.Instant;
 
 import static javax.persistence.EnumType.STRING;
@@ -52,7 +52,7 @@ public class Product
     @Column(name = "dna_identification")
     private boolean dnaIdentification = false;
 
-    @Column(name = "production_area", nullable = false)
+    @Column(name = "production_area")
     private String productionArea;
 
     @Column(name = "production_year", length = 4, nullable = false)
@@ -91,11 +91,9 @@ public class Product
     @Column(length = 500)
     private String commitment;
 
-    @Lob
     @Column(length = 1000, columnDefinition = "text")
     private String description;
 
-    @Lob
     @Column(name = "description_detail", length = 1000, columnDefinition = "text")
     private String descriptionDetail;
 

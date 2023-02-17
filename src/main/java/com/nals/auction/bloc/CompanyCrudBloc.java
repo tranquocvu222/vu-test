@@ -1,5 +1,7 @@
 package com.nals.auction.bloc;
 
+import com.nals.auction.client.MasterDataClient;
+import com.nals.auction.client.UaaClient;
 import com.nals.auction.domain.Company;
 import com.nals.auction.domain.CompanyCertification;
 import com.nals.auction.domain.CompanyTag;
@@ -14,9 +16,7 @@ import com.nals.auction.mapper.MapperHelper;
 import com.nals.auction.service.CompanyCertificationService;
 import com.nals.auction.service.CompanyService;
 import com.nals.auction.service.CompanyTagService;
-import com.nals.auction.client.MasterDataClient;
 import com.nals.auction.service.StorageService;
-import com.nals.auction.client.UaaClient;
 import com.nals.common.messages.errors.ObjectNotFoundException;
 import com.nals.common.messages.errors.ValidatorException;
 import com.nals.utils.helpers.StringHelper;
@@ -176,7 +176,6 @@ public class CompanyCrudBloc {
                                             .id(companyId)
                                             .build());
             return certification;
-
         }).collect(Collectors.toList());
     }
 
