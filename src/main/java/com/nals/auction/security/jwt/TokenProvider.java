@@ -71,6 +71,8 @@ public final class TokenProvider {
             return new UsernamePasswordAuthenticationToken(principal, token, permissions);
         } catch (JwtException | IllegalArgumentException e) {
             log.warn("Invalid JWT token trace: {}", e.getMessage());
+            //TODO handle invalid token
+            //ExceptionHandler.throwException(InvalidTokenException.class, INVALID_TOKEN);
             return null;
         }
     }

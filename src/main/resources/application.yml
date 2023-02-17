@@ -31,3 +31,21 @@ jhipster:
     authentication:
       jwt:
         base64-secret: ${JWT_BASE64_SECRET:QnP/dJWnqc9AYMokt8yPjUqDNSPKk/yS+AFy4D0LZMy2BXAC4uGSXzk2x+P11uly5WYXSRQ5qvDboHXaf+pjyw==}
+
+application:
+  uaa-url: ${UAA_URL:http://localhost:8082/api/v1/auth/}
+  master-data-url: ${MASTER_DATA_URL:http://localhost:8084/api/v1/}
+  file-upload:
+    max-size-allow: 10240
+    allow-extensions: png, jpg, jpeg, gif
+
+amazon:
+  access-key: ${AWS_ACCESS_KEY}
+  secret-key: ${AWS_SECRET_KEY}
+  region: ${AWS_REGION}
+  s3:
+    bucket-name: ${AWS_S3_BUCKET_NAME}
+    temp-dir: /tmp
+    working-dir: /working
+    use-iam-role: false
+    s3-url: ${AWS_S3_URL:https://em-project-s3.s3.ap-southeast-1.amazonaws.com}
