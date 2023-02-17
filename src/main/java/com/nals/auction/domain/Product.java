@@ -19,6 +19,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import java.time.Instant;
 
@@ -175,4 +176,21 @@ public class Product
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id")
     private Company company;
+
+    @Transient
+    private Media media;
+
+    public Product(final Long id, final String name, final String varietyName, final Long prefectureId, final String productionYear,
+                   final String certificateNumber, final Double moisture, final String mediaName) {
+        this.id = id;
+        this.name = name;
+        this.varietyName = varietyName;
+        this.prefectureId = prefectureId;
+        this.productionYear = productionYear;
+        this.certificateNumber = certificateNumber;
+        this.moisture = moisture;
+        this.media = Media.builder()
+                          .name(mediaName)
+                          .build();
+    }
 }

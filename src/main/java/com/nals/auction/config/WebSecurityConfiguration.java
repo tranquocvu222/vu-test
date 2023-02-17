@@ -22,7 +22,8 @@ import static com.nals.utils.constants.Constants.ROLE_ADMIN;
 
 @EnableWebSecurity
 @RequiredArgsConstructor
-public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
+public class WebSecurityConfiguration
+    extends WebSecurityConfigurerAdapter {
 
     private final JHipsterProperties jHipsterProperties;
     private final CorsFilter corsFilter;
@@ -45,7 +46,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     @Override
-    public void configure(final HttpSecurity http) throws Exception {
+    public void configure(final HttpSecurity http)
+        throws Exception {
 
         // @formatter:off
         http.csrf()
