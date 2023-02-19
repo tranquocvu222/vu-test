@@ -13,6 +13,7 @@ import com.nals.auction.dto.CompanyTagDto;
 import com.nals.auction.dto.ProductSearchRes;
 import com.nals.auction.dto.request.product.ProductCreateReq;
 import com.nals.auction.dto.response.AuctionRes;
+import com.nals.auction.dto.response.auction.AuctionDetailRes;
 import com.nals.utils.helpers.DateHelper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -25,11 +26,12 @@ import org.mapstruct.factory.Mappers;
 
 import java.time.Instant;
 
+import static com.nals.utils.constants.Constants.UTC_ZONE_NAME;
+
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE,
     nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
     nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface MapperHelper {
-    String UTC_ZONE_NAME = "UTC";
     MapperHelper INSTANCE = Mappers.getMapper(MapperHelper.class);
 
     Company toCompany(CompanyDto companyDto);
@@ -45,6 +47,12 @@ public interface MapperHelper {
 
     @Mapping(target = "certificateNumber", source = "certificate")
     AuctionRes toAuctionRes(Auction auction);
+
+    @Mappings({
+        @Mapping(target = "productCertificate", source = "certificate"),
+        @Mapping(target = "productionArea", ignore = true)
+    })
+    AuctionDetailRes toAuctionDetailRes(Auction auction);
 
     @Mapping(target = "certificationId", source = "id")
     CompanyCertification toCompanyCertification(CertificationDto certificationDto);

@@ -4,7 +4,7 @@ import com.nals.auction.client.MasterDataClient;
 import com.nals.auction.client.UaaClient;
 import com.nals.auction.domain.Product;
 import com.nals.auction.dto.ProductSearchRes;
-import com.nals.auction.dto.response.PrefectureRes;
+import com.nals.auction.dto.response.prefecture.PrefectureRes;
 import com.nals.auction.mapper.MapperHelper;
 import com.nals.auction.service.ProductService;
 import com.nals.auction.service.StorageService;
@@ -53,7 +53,7 @@ public class ProductListBloc {
 
         //TODO using cache for get this data
         var prefectureResMap = masterDataClient
-                .getPrefectureRes(prefectureIds)
+                .fetchPrefectureRes(prefectureIds)
                 .stream()
                 .collect(Collectors.toMap(PrefectureRes::getId, Function.identity()));
 

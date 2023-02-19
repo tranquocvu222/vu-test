@@ -21,7 +21,7 @@ public class ProductService
 
     public Optional<Product> getByIdAndCompanyId(final Long id, final Long companyId) {
         log.info("Get product by id #{} and company id #{}", id, companyId);
-        return getRepository().getProductByIdAndCompanyId(id, companyId);
+        return getRepository().findByIdAndCompanyId(id, companyId);
     }
 
     public Page<Product> searchProducts(final String name,

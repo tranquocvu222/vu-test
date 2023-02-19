@@ -5,7 +5,7 @@ import com.nals.auction.domain.Media;
 import com.nals.auction.dto.request.AuctionSearchReq;
 import com.nals.auction.dto.response.AuctionRes;
 import com.nals.auction.dto.response.MediaRes;
-import com.nals.auction.dto.response.PrefectureRes;
+import com.nals.auction.dto.response.prefecture.PrefectureRes;
 import com.nals.auction.mapper.MapperHelper;
 import com.nals.auction.service.AuctionService;
 import com.nals.auction.service.MediaService;
@@ -19,7 +19,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
@@ -62,7 +61,7 @@ public class AuctionListBloc {
                                    .collect(Collectors.groupingBy(MediaRes::getSourceId));
 
         //TODO using cache for get this data
-        var prefectureResMap = masterDataClient.getPrefectureRes(prefectureIds)
+        var prefectureResMap = masterDataClient.fetchPrefectureRes(prefectureIds)
                                                .stream()
                                                .collect(Collectors.toMap(PrefectureRes::getId, Function.identity()));
 

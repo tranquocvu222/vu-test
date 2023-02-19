@@ -11,6 +11,7 @@ import org.springframework.util.CollectionUtils;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -30,5 +31,10 @@ public class MediaService
         }
 
         return getRepository().fetchBySourceId(sourceIds, mediaTypes);
+    }
+
+    public Optional<Media> getBySourceIdAndType(final Long sourceId, final MediaType type) {
+        log.info("Get media by source id #{} and type #{}", sourceId, type);
+        return getRepository().findBySourceIdAndType(sourceId, type);
     }
 }
