@@ -1,5 +1,6 @@
 package com.nals.auction.mapper;
 
+import com.nals.auction.domain.Auction;
 import com.nals.auction.domain.Company;
 import com.nals.auction.domain.CompanyCertification;
 import com.nals.auction.domain.CompanyTag;
@@ -10,6 +11,7 @@ import com.nals.auction.dto.CompanyDto;
 import com.nals.auction.dto.CompanyInfoDto;
 import com.nals.auction.dto.CompanyTagDto;
 import com.nals.auction.dto.request.product.ProductCreateReq;
+import com.nals.auction.dto.response.AuctionRes;
 import com.nals.utils.helpers.DateHelper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -26,6 +28,7 @@ import java.time.Instant;
     nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
     nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface MapperHelper {
+    String UTC_ZONE_NAME = "UTC";
     MapperHelper INSTANCE = Mappers.getMapper(MapperHelper.class);
 
     Company toCompany(CompanyDto companyDto);
@@ -39,6 +42,9 @@ public interface MapperHelper {
 
     CompanyTag toCompanyTag(CompanyTagDto companyTagDto);
 
+    @Mapping(target = "certificateNumber", source = "certificate")
+    AuctionRes toAuctionRes(Auction auction);
+
     @Mapping(target = "certificationId", source = "id")
     CompanyCertification toCompanyCertification(CertificationDto certificationDto);
 
@@ -50,5 +56,9 @@ public interface MapperHelper {
 
     default Instant toInstant(String dateTime) {
         return DateHelper.toInstant(dateTime);
+    }
+
+    default String fromInstant(Instant instant) {
+        return DateHelper.toStringISOFormatWithZoneName(instant, UTC_ZONE_NAME);
     }
 }

@@ -20,7 +20,6 @@ import static com.nals.auction.exception.ExceptionHandler.OBJECT_NOT_FOUND;
 public class UaaClient
     extends BaseClient {
 
-    private static final String UAA_URI_PREFIX = "uaa";
     private static final String USER_URI_PREFIX = "users";
 
     private final ExceptionHandler exceptionHandler;
@@ -41,7 +40,7 @@ public class UaaClient
         var currentUserId = SecurityHelper.getCurrentUserId();
         log.info("Get current user with id #{}", currentUserId);
 
-        var url = String.format("%s/%s/%s/%s", getBaseUri(), UAA_URI_PREFIX, USER_URI_PREFIX, currentUserId.toString());
+        var url = String.format("%s/%s/%s", getBaseUri(), USER_URI_PREFIX, currentUserId.toString());
 
         try {
             var response = get(url, UserDto.class);
@@ -54,7 +53,7 @@ public class UaaClient
 
     public void attachCompanyToUser(final Long companyId, final Long userId) {
         log.info("Attach company with companyId #{} to user #{}", companyId, userId);
-        var url = String.format("%s/%s/%s", getBaseUri(), UAA_URI_PREFIX, USER_URI_PREFIX);
+        var url = String.format("%s/%s", getBaseUri(), USER_URI_PREFIX);
         var req = UserCompanyUpdateReq.builder()
                                       .id(userId)
                                       .companyId(companyId)

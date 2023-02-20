@@ -1,12 +1,14 @@
 package com.nals.auction.client;
 
 import com.nals.auction.client.InternalClientConfigFactory.InternalClient;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
@@ -40,6 +42,11 @@ public abstract class BaseClient {
 
     protected <T> ResponseEntity<T> post(final String url, final Object request, final Class<T> responseEntity) {
         return restTemplate.postForEntity(url, request, responseEntity);
+    }
+
+    protected <T> ResponseEntity<T> post(final String apiUrl, final Object request, final ParameterizedTypeReference<T> responseEntity) {
+        var requestEntity = new HttpEntity<>(request, getHeaders());
+        return restTemplate.exchange(apiUrl, POST, requestEntity, responseEntity);
     }
 
     protected <T> ResponseEntity<T> put(final String apiUrl, final Object request, final Class<T> responseEntity) {
