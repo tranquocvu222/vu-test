@@ -22,19 +22,30 @@ public class MediaService
         super(repository);
     }
 
-    public List<Media> fetchBySourceId(final Collection<Long> sourceIds,
-                                       final Collection<MediaType> mediaTypes) {
+    public List<Media> fetchBySourceIdsAndTypes(final Collection<Long> sourceIds,
+                                                final Collection<MediaType> mediaTypes) {
         log.info("Fetch media in sourceIds #{} and mediaTypes #{}", sourceIds, mediaTypes);
 
         if (CollectionUtils.isEmpty(mediaTypes) || CollectionUtils.isEmpty(sourceIds)) {
             return Collections.emptyList();
         }
 
-        return getRepository().fetchBySourceId(sourceIds, mediaTypes);
+        return getRepository().fetchBySourceIdsAndTypes(sourceIds, mediaTypes);
     }
 
     public Optional<Media> getBySourceIdAndType(final Long sourceId, final MediaType type) {
         log.info("Get media by source id #{} and type #{}", sourceId, type);
         return getRepository().findBySourceIdAndType(sourceId, type);
+    }
+
+    public List<Media> fetchBySourceIdAndTypes(final Long sourceId,
+                                               final Collection<MediaType> mediaTypes) {
+        log.info("Fetch media in sourceId #{} and mediaTypes #{}", sourceId, mediaTypes);
+
+        if (CollectionUtils.isEmpty(mediaTypes)) {
+            return Collections.emptyList();
+        }
+
+        return getRepository().fetchBySourceIdAndTypes(sourceId, mediaTypes);
     }
 }

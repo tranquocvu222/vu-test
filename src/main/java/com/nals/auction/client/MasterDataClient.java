@@ -125,4 +125,18 @@ public class MasterDataClient
             return Collections.emptyList();
         }
     }
+
+    public PrefectureRes getPrefectureById(final Long id) {
+        log.info("Get prefecture by id #{}", id);
+        var url = String.format("%s/%s/%s", getBaseUri(), PREFECTURE_URI_PREFIX, id.toString());
+
+        try {
+            var response = get(url, PrefectureRes.class);
+            return response.getBody();
+        } catch (Exception exception) {
+            throw new ValidatorException("prefecture_id",
+                                         exceptionHandler.getMessageCode(NOT_FOUND),
+                                         exceptionHandler.getMessageContent(NOT_FOUND));
+        }
+    }
 }

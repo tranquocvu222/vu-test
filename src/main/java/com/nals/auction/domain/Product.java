@@ -46,6 +46,9 @@ public class Product
     @Column(nullable = false)
     private String name;
 
+    @Column(name = "variety_id", nullable = false)
+    private Long varietyId;
+
     @Column(name = "variety_name", nullable = false)
     private String varietyName;
 

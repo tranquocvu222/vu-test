@@ -5,6 +5,8 @@ import com.nals.auction.dto.request.product.ProductCreateReq;
 import com.nals.utils.controller.BaseController;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,5 +31,11 @@ public class ProductCrudController
     @PreAuthorize("hasRole('SELLER')")
     public ResponseEntity<?> createProduct(@Valid @RequestBody final ProductCreateReq req) {
         return created(productCrudBloc.createProduct(req));
+    }
+
+    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('SELLER')")
+    public ResponseEntity<?> getProductDetail(@PathVariable final Long id) {
+        return ok(productCrudBloc.getProductById(id));
     }
 }
