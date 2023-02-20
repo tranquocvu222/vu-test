@@ -1,4 +1,4 @@
-package com.nals.auction.dto.request.product;
+package com.nals.auction.dto.request;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -17,10 +17,11 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class ProductCreateReq {
+public class ProductReq {
 
     private Long prefectureId;
     private String name;
+    private Long varietyId;
     private String varietyName;
     private Boolean dnaIdentification;
     private String productionArea;

@@ -25,9 +25,10 @@ public class ProductListController
 
     @GetMapping
     @PreAuthorize("hasRole('SELLER')")
-    public ResponseEntity<?> searchProducts(@RequestParam(required = false) final String name,
-                                            @RequestParam(defaultValue = "0") int page,
-                                            @RequestParam(value = "per_page", defaultValue = "10") int perPage) {
+    public ResponseEntity<?> searchProducts(
+        final @RequestParam(required = false) String name,
+        final @RequestParam(defaultValue = "0", required = false) int page,
+        final @RequestParam(value = "per_page", defaultValue = "10", required = false) int perPage) {
         return ok(productListBloc.searchProducts(name, page, perPage));
     }
 }
