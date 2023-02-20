@@ -64,8 +64,8 @@ public class Company
     @Column(name = "fax_number")
     private String faxNumber;
 
-    @Builder.Default
     @Column
+    @Builder.Default
     private boolean approved = false;
 
     @ToString.Exclude

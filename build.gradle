@@ -20,10 +20,10 @@ repositories {
     mavenCentral()
     gradlePluginPortal()
     maven {
-        url "https://rmt-469059878066.d.codeartifact.ap-southeast-1.amazonaws.com/maven/rmt-repository/"
+        url "https://rmt-dev-430334909132.d.codeartifact.us-east-2.amazonaws.com/maven/rmt-dev/"
         credentials {
             username "aws"
-            password "eyJ2ZXIiOjEsImlzdSI6MTY3NjU5MTkzOCwiZW5jIjoiQTEyOEdDTSIsInRhZyI6IlhwcW0weW9lekt6MG0wRVpfQ0pMV1EiLCJleHAiOjE2NzY2MzUxMzgsImFsZyI6IkExMjhHQ01LVyIsIml2Ijoic0c2QkRCM21xeVBYWUhjMCJ9.CxdQTZUeBi9Fir0Q9KKDmw.5Fhlof4lYKVY_wef.CMQjPsLmK5xOltYaQ6m4eFFP0SQcakeE-Sx4waElkrOgaHGzwrAKH8QfMokXUEGnHQ6i0KW-V4W7_4clChVaNHxzq8kAei5fHcev_x3IRI2Adi7hwTY8aCJcmQp5hD4atB_WRj1V5z5Qpa699-Gd1527T48jpaDl5-kKrrWZJQz9JU8ckGpy9a6qC74vK31YDladBTHba2KyiAVg5XPIIWEQYhq5wRZl5ed_LBU78NvrEvTbl7oIBYHv-MMbTaBEE24MiHXV8jk4a9A5wHzTgDv3mhbA5Nh5G2yvKJeRIV57bHovekwIXzaoaAA_vxF9jvEJC2NTnTJCOlH90A2wbX4nNmgdKtpRQZv05FEslew5NUmTax5a-Ba8InzxOps9UM_9m98UVmzj68i-FKVMV96GjNNHHx28dvD0aC79zzkFyru4GFgZHK6Vum1K0vDhFD24Kg_jiX3LfrXVK_obPCLDYgQYs2W_J6BhOItSFaUF1BLs-iw__0cGH8wk71Cc2xE4GxnzBjhA8Cxv3AIWSQet01rPh-yd749UWM5q-UEsxxO-acxuVYVnTj6XYZnlhz9f3FXSuOfVCNf1tZWK6YCyjHwzo7KRh15MFhkFw9fdf0wOoNQr4_4GiMAUAWR5buhprn-AJ0rY9TS7SZOXFuXQ1T9pN7k9eqFnlF0Ap0jZIjxecQiT5TiU2DV6yo3gnnYpL4IxbLp1TGXbeDXPEFe5V1K1qCVM_K75vPmFyh4yF0O8S6KC3-S-zid_kIjHdrtrML3YphRwk5AZmqPzL_bK4ohcMZyrMde7s3G31TWUKfCVflMiW1n5zirW7Om-OjfdN0HQhimyq6BRXbgnfHn5w--kLbQJUn9K06FSEPPRxDmWvDeuVu2Aa9KuJ5x8xK28e8wg945kl6Jhf4DP3F0JJBgf2TChq5a0pgdO9X2c4vOW7bmwG9lyxnY6KFgqnvsXvZg.R9nBAhBxQ8XUmt6SoZNKmg"
+            password System.getenv("CODEARTIFACT_AUTH_TOKEN")
         }
     }
 }

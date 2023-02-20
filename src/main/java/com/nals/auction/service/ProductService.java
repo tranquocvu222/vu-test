@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 public class ProductService
     extends BaseService<Product, ProductRepository> {
 
-    public ProductService(ProductRepository repository) {
+    public ProductService(final ProductRepository repository) {
         super(repository);
     }
 }

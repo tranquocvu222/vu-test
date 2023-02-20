@@ -13,10 +13,12 @@ import com.nals.utils.helpers.RandomHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.Objects;
 import java.util.Set;
 
@@ -137,7 +139,7 @@ public class StorageService {
             return fileName;
         }
 
-        return FileHelper.concatPath(s3Url, "/",workingDir, fileName.trim());
+        return FileHelper.concatPath(s3Url, "/", workingDir, fileName.trim());
     }
 
     public void saveFile(final String fileName) {
@@ -147,6 +149,13 @@ public class StorageService {
 
         validateExtension(fileName, allowExtensions);
         moveFile(tempDir, workingDir, fileName);
+    }
+
+    public void saveFiles(final Collection<String> fileNames) {
+        if (CollectionUtils.isEmpty(fileNames)) {
+            return;
+        }
+        fileNames.forEach(this::saveFile);
     }
 
     public void replaceFile(final String fileName, final String oldFileName) {

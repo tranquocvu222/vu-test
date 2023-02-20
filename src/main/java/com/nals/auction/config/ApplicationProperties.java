@@ -5,6 +5,7 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -19,13 +20,18 @@ import java.util.Set;
 public class ApplicationProperties {
 
     private FileUpload fileUpload;
-    private String masterDataUrl;
-    private String uaaUrl;
+    private Map<String, InternalClientConfig> internalClients;
 
     @Getter
     @Setter
     public static class FileUpload {
         private int maxSizeAllow = 10240;
         private Set<String> allowExtensions = new HashSet<>();
+    }
+
+    @Getter
+    @Setter
+    public static class InternalClientConfig {
+        private String baseUri;
     }
 }
