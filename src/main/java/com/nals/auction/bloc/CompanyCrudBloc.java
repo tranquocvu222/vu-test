@@ -78,7 +78,8 @@ public class CompanyCrudBloc {
     @Transactional
     public Long createCompany(final CompanyDto dto) {
         var currentUser = uaaClient.getCurrentUser();
-        log.info("Create company for user #{}", currentUser.getId());
+        var currentUserId = currentUser.getId();
+        log.info("Create company for user #{}", currentUserId);
 
         if (Objects.nonNull(currentUser.getCompanyId())) {
             throw new ValidatorException(exceptionHandler.getMessageCode(EXISTS_COMPANY_WITH_USER),
@@ -94,7 +95,7 @@ public class CompanyCrudBloc {
         companyTagService.saveAll(toCompanyTags(dto.getCompanyTags(), companyId));
         companyCertificationService.saveAll(toCompanyCertifications(dto.getCertifications(), companyId));
 
-        uaaClient.attachCompanyToUser(companyId, currentUser.getId());
+        uaaClient.attachCompanyToUser(companyId, currentUserId);
 
         return companyId;
     }

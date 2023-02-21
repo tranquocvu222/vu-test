@@ -4,12 +4,17 @@ import com.nals.auction.client.InternalClientConfigFactory.InternalClient;
 import com.nals.auction.dto.CertificationDto;
 import com.nals.auction.dto.LocationDto;
 import com.nals.auction.dto.request.CertificationReq;
+import com.nals.auction.dto.response.PrefectureRes;
 import com.nals.auction.exception.ExceptionHandler;
 import com.nals.common.messages.errors.ValidatorException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import static com.nals.auction.client.InternalClientConfigFactory.InternalClient.MASTER;
@@ -24,6 +29,7 @@ public class MasterDataClient
     private static final String TOWN_URI_PREFIX = "towns";
     private static final String LOCATION_URI_PREFIX = "locations";
     private static final String CERTIFICATION_URI_PREFIX = "certifications";
+    private static final String PREFECTURE_URI_PREFIX = "prefectures";
 
     private final ExceptionHandler exceptionHandler;
 
@@ -97,6 +103,25 @@ public class MasterDataClient
         } catch (Exception exception) {
             throw new ValidatorException(exceptionHandler.getMessageCode(NOT_FOUND),
                                          exceptionHandler.getMessageContent(NOT_FOUND));
+        }
+    }
+
+    public List<PrefectureRes> getPrefectureRes(final Collection<Long> prefectureIds) {
+        log.info("Get prefecture with prefectureId #{}", prefectureIds);
+
+        if (CollectionUtils.isEmpty(prefectureIds)) {
+            return Collections.emptyList();
+        }
+
+        //TODO use BaseClient
+        var url = String.format("%s/%s/%s", getBaseUri(), MASTER_DATA_URI_PREFIX, PREFECTURE_URI_PREFIX);
+
+        try {
+            var response = post(url, prefectureIds, new ParameterizedTypeReference<List<PrefectureRes>>() {});
+            return response.getBody();
+        } catch (Exception exception) {
+            log.error("Error when call API get prefecture from master data with error #{}", exception.getMessage());
+            return Collections.emptyList();
         }
     }
 }

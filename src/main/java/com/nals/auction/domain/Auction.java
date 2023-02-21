@@ -106,4 +106,33 @@ public class Auction
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id")
     private Company company;
+
+    public Auction(final Long id, final Instant startTime, final Instant endTime, final BigDecimal startPrice,
+                   final Long quantity, final AuctionStatus status, final DeliveryDateType deliveryDateType,
+                   final TradingDeadlineType tradingDeadlineType, final PaymentMethod paymentMethod,
+                   final Long prefectureId, final LogisticsArrangementType logisticsArrangementType,
+                   final String certificate, final Long productId, final String productName,
+                   final boolean specialCultivationMethod, final boolean organicJasMethod,
+                   final boolean noPesticidesMethod, final boolean otherProductionMethod) {
+        this.id = id;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.startPrice = startPrice;
+        this.quantity = quantity;
+        this.status = status;
+        this.deliveryDateType = deliveryDateType;
+        this.tradingDeadlineType = tradingDeadlineType;
+        this.paymentMethod = paymentMethod;
+        this.prefectureId = prefectureId;
+        this.certificate = certificate;
+        this.logisticsArrangementType = logisticsArrangementType;
+        this.product = Product.builder()
+                              .id(productId)
+                              .name(productName)
+                              .specialCultivationMethod(specialCultivationMethod)
+                              .organicJasMethod(organicJasMethod)
+                              .noPesticidesMethod(noPesticidesMethod)
+                              .otherProductionMethod(otherProductionMethod)
+                              .build();
+    }
 }

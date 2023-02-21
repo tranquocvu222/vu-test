@@ -42,4 +42,10 @@ public class Media
     @Enumerated(STRING)
     @Column(nullable = false)
     private MediaType type;
+
+    public Media(final Long sourceId, final String name, final MediaType type) {
+        this.sourceId = sourceId;
+        this.name = name;
+        this.type = type;
+    }
 }
