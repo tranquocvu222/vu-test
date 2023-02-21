@@ -10,6 +10,7 @@ import com.nals.auction.dto.CompanyCertificationDto;
 import com.nals.auction.dto.CompanyDto;
 import com.nals.auction.dto.CompanyInfoDto;
 import com.nals.auction.dto.CompanyTagDto;
+import com.nals.auction.dto.ProductSearchRes;
 import com.nals.auction.dto.request.product.ProductCreateReq;
 import com.nals.auction.dto.response.AuctionRes;
 import com.nals.utils.helpers.DateHelper;
@@ -53,6 +54,8 @@ public interface MapperHelper {
     CompanyTagDto toCompanyTagDto(CompanyTag companyTag);
 
     Product toProduct(ProductCreateReq req);
+
+    ProductSearchRes toProductSearchRes(Product product);
 
     default Instant toInstant(String dateTime) {
         return DateHelper.toInstant(dateTime);
