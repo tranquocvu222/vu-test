@@ -37,12 +37,12 @@ public class WebSecurityConfiguration
     @Override
     public void configure(final WebSecurity web) {
         web.ignoring()
-                .antMatchers(HttpMethod.OPTIONS, "/**")
-                .antMatchers("/app/**/*.{js,html}")
-                .antMatchers("/i18n/**")
-                .antMatchers("/content/**")
-                .antMatchers("/swagger-ui/**")
-                .antMatchers("/test/**");
+           .antMatchers(HttpMethod.OPTIONS, "/**")
+           .antMatchers("/app/**/*.{js,html}")
+           .antMatchers("/i18n/**")
+           .antMatchers("/content/**")
+           .antMatchers("/swagger-ui/**")
+           .antMatchers("/test/**");
     }
 
     @Override
@@ -51,30 +51,31 @@ public class WebSecurityConfiguration
 
         // @formatter:off
         http.csrf()
-                .disable()
-                .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
-                .exceptionHandling()
-                .and()
-                .headers()
-                .xssProtection()
-                .and()
-                .contentSecurityPolicy(jHipsterProperties.getSecurity().getContentSecurityPolicy())
-                .and()
-                .referrerPolicy(
-                        ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN)
-                .and()
-                .frameOptions()
-                .deny()
-                .and()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .authorizeRequests()
-                .expressionHandler(new CustomDefaultWebSecurityExpressionHandler())
-                .antMatchers("/api/**/auctions/su/**").hasAnyRole(ROLE_ADMIN)
-                .antMatchers("/api/**").authenticated()
-                .and()
-                .apply(securityConfigurerAdapter());
+            .disable()
+            .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
+            .exceptionHandling()
+            .and()
+            .headers()
+            .xssProtection()
+            .and()
+            .contentSecurityPolicy(jHipsterProperties.getSecurity().getContentSecurityPolicy())
+            .and()
+            .referrerPolicy(
+                ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN)
+            .and()
+            .frameOptions()
+            .deny()
+            .and()
+            .sessionManagement()
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .and()
+            .authorizeRequests()
+            .expressionHandler(new CustomDefaultWebSecurityExpressionHandler())
+            .antMatchers("/api/*/auctions/**").authenticated()
+            .antMatchers("/api/**/auctions/su/**").hasAnyRole(ROLE_ADMIN)
+            .antMatchers("/api/**").authenticated()
+            .and()
+            .apply(securityConfigurerAdapter());
         // @formatter:on
     }
 
