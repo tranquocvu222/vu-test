@@ -28,8 +28,6 @@ import org.mapstruct.factory.Mappers;
 
 import java.time.Instant;
 
-import static com.nals.utils.constants.Constants.UTC_ZONE_NAME;
-
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE,
     nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
     nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -74,10 +72,6 @@ public interface MapperHelper {
 
     default Instant toInstant(String dateTime) {
         return DateHelper.toInstant(dateTime);
-    }
-
-    default String fromInstant(Instant instant) {
-        return DateHelper.toStringISOFormatWithZoneName(instant, UTC_ZONE_NAME);
     }
 
     ProductRes toProductRes(Product product);

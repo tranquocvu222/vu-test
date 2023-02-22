@@ -39,7 +39,10 @@ import java.util.stream.Collectors;
 
 import static com.nals.auction.exception.ExceptionHandler.INVALID_DATA;
 import static com.nals.auction.exception.ExceptionHandler.OBJECT_NOT_FOUND;
+import static com.nals.auction.exception.ExceptionHandler.PUBLISH_AUCTION_FAILED;
 import static com.nals.auction.exception.ExceptionHandler.REQUIRED_NOT_NULL;
+import static com.nals.utils.enums.AuctionStatus.DRAFT;
+import static com.nals.utils.enums.AuctionStatus.OPEN;
 import static com.nals.utils.enums.DeliveryDateType.WITHIN_A_MONTH;
 import static java.time.temporal.ChronoUnit.HOURS;
 
@@ -47,14 +50,53 @@ import static java.time.temporal.ChronoUnit.HOURS;
 @Service
 @RequiredArgsConstructor
 public class AuctionCrudBloc {
+
     private final AuctionService auctionService;
-    private final UaaClient uaaClient;
-    private final ExceptionHandler exceptionHandler;
     private final ProductService productService;
     private final CompanyService companyService;
     private final MediaService mediaService;
     private final StorageService storageService;
+    private final UaaClient uaaClient;
     private final MasterDataClient masterDataClient;
+    private final ExceptionHandler exceptionHandler;
+
+    @Transactional(readOnly = true)
+    public AuctionDetailRes getAuctionById(final Long id) {
+        log.info("Get auction by id #{}", id);
+        var auction =
+            auctionService
+                .getById(id)
+                .orElseThrow(() -> new ObjectNotFoundException("auction",
+                                                               exceptionHandler.getMessageCode(OBJECT_NOT_FOUND),
+                                                               exceptionHandler.getMessageContent(OBJECT_NOT_FOUND)));
+
+        var media = mediaService.getBySourceIdAndType(auction.getProduct().getId(), MediaType.PRODUCT_THUMBNAIL)
+                                .orElse(null);
+
+        var auctionPrefectureId = auction.getPrefectureId();
+        var productPrefectureId = auction.getProduct().getPrefectureId();
+        var prefectureIds = Arrays.asList(auctionPrefectureId, productPrefectureId);
+        var prefectureResMap = masterDataClient.fetchPrefectureRes(prefectureIds)
+                                               .stream()
+                                               .collect(Collectors.toMap(PrefectureRes::getId, Function.identity()));
+
+        var auctionRes = MapperHelper.INSTANCE.toAuctionDetailRes(auction);
+
+        auctionRes.setProductionArea(prefectureResMap.get(productPrefectureId));
+        auctionRes.setPrefectureRes(prefectureResMap.get(auctionPrefectureId));
+
+        if (Objects.nonNull(media)) {
+            auctionRes.setImageName(media.getName());
+            auctionRes.setProductImage(storageService.getFullFileUrl(media.getName()));
+        }
+
+        //TODO mapping other and delivery if type is WITHIN_SOME_DAYS and type is OTHER
+        auctionRes.setDeliveryDateType(getDeliveryDate(auction));
+        auctionRes.setTradingDeadlineType(getTradingDeadline(auction));
+        auctionRes.setPaymentMethod(getPaymentMethod(auction));
+
+        return auctionRes;
+    }
 
     @Transactional
     public Long createAuction(final AuctionReq req) {
@@ -67,6 +109,47 @@ public class AuctionCrudBloc {
         var auction = auctionService.save(buildAuction(req, currentUser, currentTime));
 
         return auction.getId();
+    }
+
+    @Transactional
+    public void publishAuction(final Long id) {
+        log.info("Publish auction by id #{}", id);
+
+        var companyId = uaaClient.getCurrentUser().getCompanyId();
+        var auction =
+            auctionService
+                .getAuctionByIdAndCompanyIdAndStatus(id, companyId, DRAFT)
+                .orElseThrow(() -> new ObjectNotFoundException("auction",
+                                                               exceptionHandler.getMessageCode(OBJECT_NOT_FOUND),
+                                                               exceptionHandler.getMessageContent(OBJECT_NOT_FOUND)));
+        var now = Instant.now();
+
+        if (now.isBefore(auction.getStartTime()) || (now.plus(24, HOURS)).isAfter(auction.getEndTime())) {
+            throw new ValidatorException(exceptionHandler.getMessageCode(PUBLISH_AUCTION_FAILED),
+                                         exceptionHandler.getMessageContent(PUBLISH_AUCTION_FAILED));
+        }
+
+        auction.setStatus(OPEN);
+        auction.setStartTime(now);
+        auctionService.save(auction);
+    }
+
+    @Transactional
+    public void unpublishAuction(final Long id) {
+        log.info("Unpublish auction by id #{}", id);
+
+        var companyId = uaaClient.getCurrentUser().getCompanyId();
+        var auction =
+            auctionService
+                .getAuctionByIdAndCompanyIdAndStatus(id, companyId, OPEN)
+                .orElseThrow(() -> new ObjectNotFoundException("auction",
+                                                               exceptionHandler.getMessageCode(OBJECT_NOT_FOUND),
+                                                               exceptionHandler.getMessageContent(OBJECT_NOT_FOUND)));
+
+        //TODO verify condition
+
+        auction.setStatus(DRAFT);
+        auctionService.save(auction);
     }
 
     private Auction buildAuction(final AuctionReq req, final UserDto userDto, final Instant currentTime) {
@@ -223,44 +306,6 @@ public class AuctionCrudBloc {
                                              exceptionHandler.getMessageContent(INVALID_DATA));
             }
         }
-    }
-
-    @Transactional(readOnly = true)
-    public AuctionDetailRes getAuctionById(final Long id) {
-        log.info("Get auction by id #{}", id);
-        var auction =
-            auctionService
-                .getById(id)
-                .orElseThrow(() -> new ObjectNotFoundException("auction",
-                                                               exceptionHandler.getMessageCode(OBJECT_NOT_FOUND),
-                                                               exceptionHandler.getMessageContent(OBJECT_NOT_FOUND)));
-
-        var media = mediaService.getBySourceIdAndType(auction.getProduct().getId(), MediaType.PRODUCT_THUMBNAIL)
-                                .orElse(null);
-
-        var auctionPrefectureId = auction.getPrefectureId();
-        var productPrefectureId = auction.getProduct().getPrefectureId();
-        var prefectureIds = Arrays.asList(auctionPrefectureId, productPrefectureId);
-        var prefectureResMap = masterDataClient.fetchPrefectureRes(prefectureIds)
-                                               .stream()
-                                               .collect(Collectors.toMap(PrefectureRes::getId, Function.identity()));
-
-        var auctionRes = MapperHelper.INSTANCE.toAuctionDetailRes(auction);
-
-        auctionRes.setProductionArea(prefectureResMap.get(productPrefectureId));
-        auctionRes.setPrefectureRes(prefectureResMap.get(auctionPrefectureId));
-
-        if (Objects.nonNull(media)) {
-            auctionRes.setImageName(media.getName());
-            auctionRes.setProductImage(storageService.getFullFileUrl(media.getName()));
-        }
-
-        //TODO mapping other and delivery if type is WITHIN_SOME_DAYS and type is OTHER
-        auctionRes.setDeliveryDateType(getDeliveryDate(auction));
-        auctionRes.setTradingDeadlineType(getTradingDeadline(auction));
-        auctionRes.setPaymentMethod(getPaymentMethod(auction));
-
-        return auctionRes;
     }
 
     //TODO change response
