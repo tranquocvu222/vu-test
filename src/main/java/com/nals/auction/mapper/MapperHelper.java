@@ -11,6 +11,8 @@ import com.nals.auction.dto.CompanyDto;
 import com.nals.auction.dto.CompanyInfoDto;
 import com.nals.auction.dto.CompanyTagDto;
 import com.nals.auction.dto.ProductSearchRes;
+import com.nals.auction.dto.ProductCompanyRes;
+import com.nals.auction.dto.ProductRes;
 import com.nals.auction.dto.request.product.ProductCreateReq;
 import com.nals.auction.dto.response.AuctionRes;
 import com.nals.auction.dto.response.auction.AuctionDetailRes;
@@ -72,4 +74,8 @@ public interface MapperHelper {
     default String fromInstant(Instant instant) {
         return DateHelper.toStringISOFormatWithZoneName(instant, UTC_ZONE_NAME);
     }
+
+    ProductRes toProductRes(Product product);
+
+    ProductCompanyRes toProductCompanyRes(Company company);
 }

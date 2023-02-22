@@ -15,13 +15,21 @@ import java.util.Optional;
 public interface MediaRepository
     extends JpaRepository<Media, Long> {
 
+    Optional<Media> findBySourceIdAndType(Long sourceId, MediaType type);
+
     @Query("SELECT new Media(m.sourceId, m.name, m.type)"
         + " FROM Media m"
         + " WHERE m.sourceId IN :sourceIds"
         + " AND (m.type IN :types)"
         + " ORDER BY m.id ASC")
-    List<Media> fetchBySourceId(@Param("sourceIds") Collection<Long> sourceIds,
-                                @Param("types") Collection<MediaType> types);
+    List<Media> fetchBySourceIdsAndTypes(@Param("sourceIds") Collection<Long> sourceIds,
+                                         @Param("types") Collection<MediaType> types);
 
-    Optional<Media> findBySourceIdAndType(Long sourceId, MediaType type);
+    @Query("SELECT new Media(m.id, m.sourceId, m.name, m.type)"
+        + " FROM Media m"
+        + " WHERE m.sourceId = :sourceId"
+        + " AND (m.type IN :types)"
+        + " ORDER BY m.id ASC")
+    List<Media> fetchBySourceIdAndTypes(@Param("sourceId") Long sourceId,
+                                        @Param("types") Collection<MediaType> types);
 }

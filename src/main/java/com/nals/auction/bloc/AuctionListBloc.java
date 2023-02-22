@@ -55,7 +55,7 @@ public class AuctionListBloc {
                                  .stream()
                                  .collect(Collectors.toList());
 
-        var mediaMap = mediaService.fetchBySourceId(productIds, PRODUCT_MEDIA_TYPE)
+        var mediaMap = mediaService.fetchBySourceIdsAndTypes(productIds, PRODUCT_MEDIA_TYPE)
                                    .stream()
                                    .map(this::toMediaRes)
                                    .collect(Collectors.groupingBy(MediaRes::getSourceId));

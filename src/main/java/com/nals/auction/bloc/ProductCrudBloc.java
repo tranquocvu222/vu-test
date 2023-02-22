@@ -1,15 +1,20 @@
 package com.nals.auction.bloc;
 
+import com.nals.auction.client.MasterDataClient;
 import com.nals.auction.client.UaaClient;
 import com.nals.auction.domain.Company;
 import com.nals.auction.domain.Media;
+import com.nals.auction.dto.ImageRes;
+import com.nals.auction.dto.ProductRes;
 import com.nals.auction.dto.request.product.ProductCreateReq;
 import com.nals.auction.exception.ExceptionHandler;
 import com.nals.auction.mapper.MapperHelper;
 import com.nals.auction.service.MediaService;
 import com.nals.auction.service.ProductService;
 import com.nals.auction.service.StorageService;
+import com.nals.common.messages.errors.ObjectNotFoundException;
 import com.nals.common.messages.errors.ValidatorException;
+import com.nals.utils.enums.MediaType;
 import com.nals.utils.helpers.StringHelper;
 import com.nals.utils.helpers.ValidatorHelper;
 import lombok.RequiredArgsConstructor;
@@ -19,12 +24,15 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.time.Instant;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.nals.auction.exception.ExceptionHandler.COMPANY_NOT_CREATED;
 import static com.nals.auction.exception.ExceptionHandler.INVALID_DATA;
+import static com.nals.auction.exception.ExceptionHandler.OBJECT_NOT_FOUND;
 import static com.nals.auction.exception.ExceptionHandler.REQUIRED_NOT_BLANK;
 import static com.nals.utils.constants.Constants.ARSENIC_MAX_LENGTH;
 import static com.nals.utils.constants.Constants.CADMIUM_MAX_LENGTH;
@@ -55,12 +63,42 @@ import static com.nals.utils.enums.MediaType.PRODUCT_THUMBNAIL;
 public class ProductCrudBloc {
 
     private static final int MAX_IMAGES_UPLOAD = 20;
+    private static final Set<MediaType> PRODUCT_MEDIA_TYPE = EnumSet.of(PRODUCT_THUMBNAIL, PRODUCT_IMAGE);
 
     private final ProductService productService;
     private final StorageService storageService;
     private final MediaService mediaService;
     private final ExceptionHandler exceptionHandler;
     private final UaaClient uaaClient;
+    private final MasterDataClient masterDataClient;
+
+    @Transactional(readOnly = true)
+    public ProductRes getProductById(final Long id) {
+        log.info("Get product detail by id: #{}", id);
+
+        var companyId = uaaClient.getCurrentUser().getCompanyId();
+        var product = productService
+            .getByIdAndCompanyId(id, companyId)
+            .orElseThrow(() -> new ObjectNotFoundException("product",
+                                                           exceptionHandler.getMessageCode(OBJECT_NOT_FOUND),
+                                                           exceptionHandler.getMessageContent(OBJECT_NOT_FOUND)));
+        var productRes = MapperHelper.INSTANCE.toProductRes(product);
+        productRes.setPrefecture(masterDataClient.getPrefectureById(product.getPrefectureId()));
+        List<ImageRes> imageRes = mediaService.fetchBySourceIdAndTypes(id, PRODUCT_MEDIA_TYPE)
+                                              .stream()
+                                              .map(media -> {
+                                                  var mediaName = media.getName();
+                                                  return ImageRes.builder()
+                                                                 .id(media.getId())
+                                                                 .imageUrl(storageService.getFullFileUrl(mediaName))
+                                                                 .imageName(mediaName)
+                                                                 .type(media.getType())
+                                                                 .build();
+                                              })
+                                              .collect(Collectors.toList());
+        productRes.setImages(imageRes);
+        return productRes;
+    }
 
     @Transactional
     public Long createProduct(final ProductCreateReq req) {
