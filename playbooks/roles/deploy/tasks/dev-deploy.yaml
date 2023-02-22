@@ -55,7 +55,10 @@
     published_ports: "{{ host_port }}:{{ container_port }}"
     restart_policy: always
     recreate: yes
-    links: "postgres:postgres"
+    links:
+      - "postgres:postgres"
+      - "rmt-master-data:rmt-master-data"
+      - "rmt-uaa:rmt-uaa"
     env_file: "{{ application_path }}/.env"
 
 - name: Reload nginx
