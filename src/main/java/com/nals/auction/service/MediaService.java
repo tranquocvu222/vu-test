@@ -6,6 +6,7 @@ import com.nals.utils.enums.MediaType;
 import com.nals.utils.service.BaseService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Collection;
@@ -22,6 +23,17 @@ public class MediaService
         super(repository);
     }
 
+    public boolean existsBySourceIdAndType(final Long sourceId, final MediaType mediaType) {
+        log.info("Check exist media by sourceId #{} and type #{}", sourceId, mediaType);
+        return getRepository().existsBySourceIdAndType(sourceId, mediaType);
+    }
+
+    public Optional<Media> findFirstBySourceIdAndType(final Long sourceId, final MediaType type) {
+        log.info("Find first media by sourceId #{} and type #{}", sourceId, type);
+
+        return getRepository().findFirstBySourceIdAndType(sourceId, type);
+    }
+
     public List<Media> fetchBySourceIdsAndTypes(final Collection<Long> sourceIds,
                                                 final Collection<MediaType> mediaTypes) {
         log.info("Fetch media in sourceIds #{} and mediaTypes #{}", sourceIds, mediaTypes);
@@ -30,7 +42,7 @@ public class MediaService
             return Collections.emptyList();
         }
 
-        return getRepository().fetchBySourceIdsAndTypes(sourceIds, mediaTypes);
+        return getRepository().findAllBySourceIdInAndTypeIn(sourceIds, mediaTypes);
     }
 
     public Optional<Media> getBySourceIdAndType(final Long sourceId, final MediaType type) {
@@ -46,6 +58,30 @@ public class MediaService
             return Collections.emptyList();
         }
 
-        return getRepository().fetchBySourceIdAndTypes(sourceId, mediaTypes);
+        return getRepository().findAllBySourceIdAndTypeIn(sourceId, mediaTypes);
+    }
+
+    @Transactional
+    public void deleteBySourceIdAndTypes(final Long sourceId, final Collection<MediaType> types) {
+        log.info("Delete media by source id #{} and types #{}", sourceId, types);
+
+        if (CollectionUtils.isEmpty(types)) {
+            Collections.emptyList();
+        }
+
+        getRepository().deleteBySourceIdAndTypeIn(sourceId, types);
+    }
+
+    @Transactional
+    public void deleteBySourceIdAndNamesAndTypes(final Long sourceId,
+                                                 Collection<String> imageNames,
+                                                 final Collection<MediaType> types) {
+        log.info("Delete media by sourceId #{} and types #{} and imageNames #{}", sourceId, types, imageNames);
+
+        if (CollectionUtils.isEmpty(imageNames) || CollectionUtils.isEmpty(types)) {
+            Collections.emptyList();
+        }
+
+        getRepository().deleteBySourceIdAndNameInAndTypeIn(sourceId, imageNames, types);
     }
 }

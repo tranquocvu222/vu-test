@@ -4,9 +4,9 @@ import com.nals.auction.client.MasterDataClient;
 import com.nals.auction.client.UaaClient;
 import com.nals.auction.domain.Company;
 import com.nals.auction.domain.Media;
+import com.nals.auction.dto.request.ProductReq;
 import com.nals.auction.dto.ImageRes;
 import com.nals.auction.dto.ProductRes;
-import com.nals.auction.dto.request.product.ProductCreateReq;
 import com.nals.auction.exception.ExceptionHandler;
 import com.nals.auction.mapper.MapperHelper;
 import com.nals.auction.service.MediaService;
@@ -21,9 +21,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
@@ -34,6 +35,7 @@ import static com.nals.auction.exception.ExceptionHandler.COMPANY_NOT_CREATED;
 import static com.nals.auction.exception.ExceptionHandler.INVALID_DATA;
 import static com.nals.auction.exception.ExceptionHandler.OBJECT_NOT_FOUND;
 import static com.nals.auction.exception.ExceptionHandler.REQUIRED_NOT_BLANK;
+import static com.nals.auction.exception.ExceptionHandler.REQUIRED_NOT_NULL;
 import static com.nals.utils.constants.Constants.ARSENIC_MAX_LENGTH;
 import static com.nals.utils.constants.Constants.CADMIUM_MAX_LENGTH;
 import static com.nals.utils.constants.Constants.CERTIFICATE_NUMBER_MAX_LENGTH;
@@ -63,7 +65,7 @@ import static com.nals.utils.enums.MediaType.PRODUCT_THUMBNAIL;
 public class ProductCrudBloc {
 
     private static final int MAX_IMAGES_UPLOAD = 20;
-    private static final Set<MediaType> PRODUCT_MEDIA_TYPE = EnumSet.of(PRODUCT_THUMBNAIL, PRODUCT_IMAGE);
+    private static final Set<MediaType> PRODUCT_MEDIA_TYPES = EnumSet.of(PRODUCT_THUMBNAIL, PRODUCT_IMAGE);
 
     private final ProductService productService;
     private final StorageService storageService;
@@ -84,7 +86,7 @@ public class ProductCrudBloc {
                                                            exceptionHandler.getMessageContent(OBJECT_NOT_FOUND)));
         var productRes = MapperHelper.INSTANCE.toProductRes(product);
         productRes.setPrefecture(masterDataClient.getPrefectureById(product.getPrefectureId()));
-        List<ImageRes> imageRes = mediaService.fetchBySourceIdAndTypes(id, PRODUCT_MEDIA_TYPE)
+        List<ImageRes> imageRes = mediaService.fetchBySourceIdAndTypes(id, PRODUCT_MEDIA_TYPES)
                                               .stream()
                                               .map(media -> {
                                                   var mediaName = media.getName();
@@ -101,7 +103,7 @@ public class ProductCrudBloc {
     }
 
     @Transactional
-    public Long createProduct(final ProductCreateReq req) {
+    public Long createProduct(final ProductReq req) {
         var companyId = uaaClient.getCurrentUser().getCompanyId();
         log.info("Create product for companyId #{}", companyId);
 
@@ -110,7 +112,7 @@ public class ProductCrudBloc {
                                          exceptionHandler.getMessageContent(COMPANY_NOT_CREATED));
         }
 
-        validateProductCreateReq(req);
+        validateProductReq(req);
 
         var product = MapperHelper.INSTANCE.toProduct(req);
         product.setCompany(Company.builder()
@@ -121,6 +123,22 @@ public class ProductCrudBloc {
         saveImages(productId, req.getImageNames());
 
         return productId;
+    }
+
+    @Transactional
+    public void updateProduct(final Long id, final ProductReq req) {
+        var companyId = uaaClient.getCurrentUser().getCompanyId();
+        log.info("Update product for companyId #{}", companyId);
+
+        var product = productService
+            .getByIdAndCompanyId(id, companyId)
+            .orElseThrow(() -> new ObjectNotFoundException(exceptionHandler.getMessageCode(OBJECT_NOT_FOUND),
+                                                           exceptionHandler.getMessageContent(OBJECT_NOT_FOUND)));
+
+        validateProductReq(req);
+
+        productService.save(MapperHelper.INSTANCE.toProduct(req, product));
+        updateImages(id, req.getImageNames());
     }
 
     private void saveImages(final Long productId, final List<String> imageNames) {
@@ -144,11 +162,57 @@ public class ProductCrudBloc {
         storageService.saveFiles(imageNames);
     }
 
-    private void validateProductCreateReq(final ProductCreateReq req) {
+    private void updateImages(final Long productId, final List<String> imageNames) {
+        log.info("Update media with productId #{}", productId);
+        List<String> currentImageNames = mediaService.fetchBySourceIdAndTypes(productId, PRODUCT_MEDIA_TYPES)
+                                                     .stream()
+                                                     .map(Media::getName)
+                                                     .collect(Collectors.toList());
+
+        if (!CollectionUtils.isEmpty(currentImageNames) && CollectionUtils.isEmpty(imageNames)) {
+            mediaService.deleteBySourceIdAndTypes(productId, PRODUCT_MEDIA_TYPES);
+            storageService.deleteFiles(currentImageNames);
+            return;
+        }
+
+        if (!CollectionUtils.isEmpty(imageNames)) {
+            Collection<String> newImageNames = CollectionUtils.subtract(imageNames, currentImageNames);
+            Collection<String> removeImageNames = CollectionUtils.subtract(currentImageNames, imageNames);
+
+            // Save images
+            List<Media> media = newImageNames.stream()
+                                             .map(imageName -> Media.builder()
+                                                                    .sourceId(productId)
+                                                                    .name(imageName)
+                                                                    .type(PRODUCT_IMAGE)
+                                                                    .build())
+                                             .collect(Collectors.toList());
+            mediaService.saveAll(media);
+            // Delete unused product images
+            mediaService.deleteBySourceIdAndNamesAndTypes(productId, removeImageNames, PRODUCT_MEDIA_TYPES);
+
+            // Save thumbnail image
+            if (!mediaService.existsBySourceIdAndType(productId, PRODUCT_THUMBNAIL)) {
+                var thumbnailImage = mediaService.findFirstBySourceIdAndType(productId, PRODUCT_IMAGE).orElse(null);
+
+                if (Objects.nonNull(thumbnailImage)) {
+                    thumbnailImage.setType(PRODUCT_THUMBNAIL);
+                    mediaService.save(thumbnailImage);
+                }
+            }
+
+            // Save and delete file on S3
+            storageService.saveFiles(newImageNames);
+            storageService.deleteFiles(removeImageNames);
+        }
+    }
+
+    private void validateProductReq(final ProductReq req) {
         validateImages(req.getImageNames());
         validateInspectionDate(req.getInspectionDate());
 
         validateName(req.getName());
+        validateVarietyId(req.getVarietyId());
         validateVarietyName(req.getVarietyName());
         validateProductionYear(req.getProductionYear());
 
@@ -197,6 +261,14 @@ public class ProductCrudBloc {
             throw new ValidatorException("inspection_date",
                                          exceptionHandler.getMessageCode(INVALID_DATA),
                                          exceptionHandler.getMessageContent(INVALID_DATA));
+        }
+    }
+
+    private void validateVarietyId(final Long varietyId) {
+        if (Objects.isNull(varietyId)) {
+            throw new ValidatorException("variety_id",
+                                         exceptionHandler.getMessageCode(REQUIRED_NOT_NULL),
+                                         exceptionHandler.getMessageContent(REQUIRED_NOT_NULL));
         }
     }
 

@@ -3,8 +3,6 @@ package com.nals.auction.repository;
 import com.nals.auction.domain.Media;
 import com.nals.utils.enums.MediaType;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
@@ -15,21 +13,19 @@ import java.util.Optional;
 public interface MediaRepository
     extends JpaRepository<Media, Long> {
 
-    Optional<Media> findBySourceIdAndType(Long sourceId, MediaType type);
+    boolean existsBySourceIdAndType(final Long id, final MediaType mediaType);
 
-    @Query("SELECT new Media(m.sourceId, m.name, m.type)"
-        + " FROM Media m"
-        + " WHERE m.sourceId IN :sourceIds"
-        + " AND (m.type IN :types)"
-        + " ORDER BY m.id ASC")
-    List<Media> fetchBySourceIdsAndTypes(@Param("sourceIds") Collection<Long> sourceIds,
-                                         @Param("types") Collection<MediaType> types);
+    Optional<Media> findFirstBySourceIdAndType(final Long sourceId, final MediaType type);
 
-    @Query("SELECT new Media(m.id, m.sourceId, m.name, m.type)"
-        + " FROM Media m"
-        + " WHERE m.sourceId = :sourceId"
-        + " AND (m.type IN :types)"
-        + " ORDER BY m.id ASC")
-    List<Media> fetchBySourceIdAndTypes(@Param("sourceId") Long sourceId,
-                                        @Param("types") Collection<MediaType> types);
+    Optional<Media> findBySourceIdAndType(final Long sourceId, final MediaType type);
+
+    List<Media> findAllBySourceIdInAndTypeIn(final Collection<Long> sourceIds, final Collection<MediaType> types);
+
+    List<Media> findAllBySourceIdAndTypeIn(final Long sourceId, final Collection<MediaType> types);
+
+    void deleteBySourceIdAndTypeIn(final Long sourceId, final Collection<MediaType> types);
+
+    void deleteBySourceIdAndNameInAndTypeIn(final Long sourceId,
+                                            final Collection<String> imageNames,
+                                            final Collection<MediaType> types);
 }

@@ -159,7 +159,7 @@ public class StorageService {
     }
 
     public void replaceFile(final String fileName, final String oldFileName) {
-        log.debug("Replace file #{} to #{}", oldFileName, fileName);
+        log.info("Replace file #{} to #{}", oldFileName, fileName);
 
         if (Objects.equals(fileName, oldFileName) || invalidFileName(fileName)) {
             return;
@@ -174,12 +174,23 @@ public class StorageService {
     }
 
     public void deleteFile(final String fileName) {
-        log.debug("Delete file #{}", fileName);
+        log.info("Delete file #{}", fileName);
+
         if (invalidFileName(fileName)) {
             return;
         }
 
         deleteFile(workingDir, fileName);
+    }
+
+    public void deleteFiles(final Collection<String> fileNames) {
+        log.info("Delete files #{}", fileNames);
+
+        if (CollectionUtils.isEmpty(fileNames)) {
+            return;
+        }
+
+        fileNames.forEach(this::deleteFile);
     }
 
     private boolean invalidFileName(final String fileName) {

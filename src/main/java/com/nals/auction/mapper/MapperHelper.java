@@ -13,7 +13,7 @@ import com.nals.auction.dto.CompanyTagDto;
 import com.nals.auction.dto.ProductSearchRes;
 import com.nals.auction.dto.ProductCompanyRes;
 import com.nals.auction.dto.ProductRes;
-import com.nals.auction.dto.request.product.ProductCreateReq;
+import com.nals.auction.dto.request.ProductReq;
 import com.nals.auction.dto.response.AuctionRes;
 import com.nals.auction.dto.response.auction.AuctionDetailRes;
 import com.nals.utils.helpers.DateHelper;
@@ -63,9 +63,14 @@ public interface MapperHelper {
 
     CompanyTagDto toCompanyTagDto(CompanyTag companyTag);
 
-    Product toProduct(ProductCreateReq req);
+    Product toProduct(ProductReq req);
 
     ProductSearchRes toProductSearchRes(Product product);
+
+    @Mappings({
+            @Mapping(target = "id", ignore = true),
+    })
+    Product toProduct(ProductReq updateReq, @MappingTarget Product product);
 
     default Instant toInstant(String dateTime) {
         return DateHelper.toInstant(dateTime);

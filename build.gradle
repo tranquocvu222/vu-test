@@ -36,6 +36,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation "org.apache.commons:commons-lang3"
+    implementation "org.apache.commons:commons-collections4:${collections4Version}"
     implementation "org.apache.httpcomponents:httpclient"
     implementation "com.google.guava:guava:${guavaVersion}"
     implementation "tech.jhipster:jhipster-dependencies:${jhipsterDependenciesVersion}"
