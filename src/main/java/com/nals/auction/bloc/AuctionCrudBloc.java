@@ -1,5 +1,6 @@
 package com.nals.auction.bloc;
 
+import com.nals.auction.client.MasterDataClient;
 import com.nals.auction.client.UaaClient;
 import com.nals.auction.domain.Auction;
 import com.nals.auction.dto.UserDto;
@@ -7,26 +8,34 @@ import com.nals.auction.dto.request.AuctionReq;
 import com.nals.auction.dto.request.DeliveryDateReq;
 import com.nals.auction.dto.request.PaymentMethodReq;
 import com.nals.auction.dto.request.TradingDeadlineReq;
+import com.nals.auction.dto.response.auction.AuctionDetailRes;
+import com.nals.auction.dto.response.prefecture.PrefectureRes;
 import com.nals.auction.exception.ExceptionHandler;
+import com.nals.auction.mapper.MapperHelper;
 import com.nals.auction.service.AuctionService;
 import com.nals.auction.service.CompanyService;
+import com.nals.auction.service.MediaService;
 import com.nals.auction.service.ProductService;
+import com.nals.auction.service.StorageService;
 import com.nals.common.messages.errors.ObjectNotFoundException;
 import com.nals.common.messages.errors.ValidatorException;
 import com.nals.utils.enums.AuctionStatus;
 import com.nals.utils.enums.DeliveryDateType;
+import com.nals.utils.enums.MediaType;
 import com.nals.utils.enums.PaymentMethod;
 import com.nals.utils.enums.TradingDeadlineType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import javax.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
+import java.util.Arrays;
 import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static com.nals.auction.exception.ExceptionHandler.INVALID_DATA;
 import static com.nals.auction.exception.ExceptionHandler.OBJECT_NOT_FOUND;
@@ -43,6 +52,9 @@ public class AuctionCrudBloc {
     private final ExceptionHandler exceptionHandler;
     private final ProductService productService;
     private final CompanyService companyService;
+    private final MediaService mediaService;
+    private final StorageService storageService;
+    private final MasterDataClient masterDataClient;
 
     @Transactional
     public Long createAuction(final AuctionReq req) {
@@ -211,5 +223,74 @@ public class AuctionCrudBloc {
                                              exceptionHandler.getMessageContent(INVALID_DATA));
             }
         }
+    }
+
+    @Transactional(readOnly = true)
+    public AuctionDetailRes getAuctionById(final Long id) {
+        log.info("Get auction by id #{}", id);
+        var auction =
+            auctionService
+                .getById(id)
+                .orElseThrow(() -> new ObjectNotFoundException("auction",
+                                                               exceptionHandler.getMessageCode(OBJECT_NOT_FOUND),
+                                                               exceptionHandler.getMessageContent(OBJECT_NOT_FOUND)));
+
+        var media = mediaService.getBySourceIdAndType(auction.getProduct().getId(), MediaType.PRODUCT_THUMBNAIL)
+                                .orElse(null);
+
+        var auctionPrefectureId = auction.getPrefectureId();
+        var productPrefectureId = auction.getProduct().getPrefectureId();
+        var prefectureIds = Arrays.asList(auctionPrefectureId, productPrefectureId);
+        var prefectureResMap = masterDataClient.fetchPrefectureRes(prefectureIds)
+                                               .stream()
+                                               .collect(Collectors.toMap(PrefectureRes::getId, Function.identity()));
+
+        var auctionRes = MapperHelper.INSTANCE.toAuctionDetailRes(auction);
+
+        auctionRes.setProductionArea(prefectureResMap.get(productPrefectureId));
+        auctionRes.setPrefectureRes(prefectureResMap.get(auctionPrefectureId));
+
+        if (Objects.nonNull(media)) {
+            auctionRes.setImageName(media.getName());
+            auctionRes.setProductImage(storageService.getFullFileUrl(media.getName()));
+        }
+
+        //TODO mapping other and delivery if type is WITHIN_SOME_DAYS and type is OTHER
+        auctionRes.setDeliveryDateType(getDeliveryDate(auction));
+        auctionRes.setTradingDeadlineType(getTradingDeadline(auction));
+        auctionRes.setPaymentMethod(getPaymentMethod(auction));
+
+        return auctionRes;
+    }
+
+    //TODO change response
+    private String getDeliveryDate(final Auction auction) {
+        var deliveryDateType = auction.getDeliveryDateType();
+        if (DeliveryDateType.WITHIN_SOME_DAYS == deliveryDateType
+            || DeliveryDateType.OTHER == deliveryDateType) {
+            return auction.getDeliveryDateValue();
+        }
+
+        return deliveryDateType.name();
+    }
+
+    //TODO change response
+    private String getTradingDeadline(final Auction auction) {
+        var tradingDeadlineType = auction.getTradingDeadlineType();
+        if (TradingDeadlineType.OTHER == tradingDeadlineType) {
+            return auction.getTradingDeadlineValue();
+        }
+
+        return tradingDeadlineType.name();
+    }
+
+    //TODO change response
+    private String getPaymentMethod(final Auction auction) {
+        var paymentMethod = auction.getPaymentMethod();
+        if (PaymentMethod.OTHER == paymentMethod) {
+            return auction.getPaymentMethodValue();
+        }
+
+        return paymentMethod.name();
     }
 }

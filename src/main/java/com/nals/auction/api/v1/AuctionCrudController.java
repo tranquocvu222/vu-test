@@ -7,6 +7,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,5 +34,11 @@ public class AuctionCrudController
     @PreAuthorize("hasRole('SELLER')")
     public ResponseEntity<?> createAuction(@Valid @RequestBody final AuctionReq req) {
         return created(auctionCrudBloc.createAuction(req));
+    }
+
+    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('SELLER')")
+    public ResponseEntity<?> getAuctionDetail(@PathVariable final Long id) {
+        return ok(auctionCrudBloc.getAuctionById(id));
     }
 }

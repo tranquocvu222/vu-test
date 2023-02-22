@@ -14,7 +14,7 @@ import java.util.Optional;
 public interface ProductRepository
     extends JpaRepository<Product, Long> {
 
-    Optional<Product> getProductByIdAndCompanyId(Long id, Long companyId);
+    Optional<Product> findByIdAndCompanyId(Long id, Long companyId);
 
     @Query("SELECT DISTINCT new Product(p.id, p.name, p.varietyName, p.prefectureId, p.productionYear,"
         + "                             p.certificateNumber, p.moisture, m.name)"

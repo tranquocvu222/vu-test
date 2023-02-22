@@ -4,7 +4,7 @@ import com.nals.auction.client.InternalClientConfigFactory.InternalClient;
 import com.nals.auction.dto.CertificationDto;
 import com.nals.auction.dto.LocationDto;
 import com.nals.auction.dto.request.CertificationReq;
-import com.nals.auction.dto.response.PrefectureRes;
+import com.nals.auction.dto.response.prefecture.PrefectureRes;
 import com.nals.auction.exception.ExceptionHandler;
 import com.nals.common.messages.errors.ValidatorException;
 import lombok.extern.slf4j.Slf4j;
@@ -62,7 +62,7 @@ public class MasterDataClient
     public Boolean existedTownById(final Long id) {
         log.info("Existed town by id #{}", id);
         var url = String.format("%s/%s/%s/%s/%s", getBaseUri(), MASTER_DATA_URI_PREFIX,
-                                       TOWN_URI_PREFIX, id.toString(), "exists");
+                                TOWN_URI_PREFIX, id.toString(), "exists");
 
         try {
             var response = get(url, Boolean.class);
@@ -106,8 +106,8 @@ public class MasterDataClient
         }
     }
 
-    public List<PrefectureRes> getPrefectureRes(final Collection<Long> prefectureIds) {
-        log.info("Get prefecture with prefectureId #{}", prefectureIds);
+    public List<PrefectureRes> fetchPrefectureRes(final Collection<Long> prefectureIds) {
+        log.info("Fetch prefecture with prefectureId #{}", prefectureIds);
 
         if (CollectionUtils.isEmpty(prefectureIds)) {
             return Collections.emptyList();
@@ -117,7 +117,8 @@ public class MasterDataClient
         var url = String.format("%s/%s/%s", getBaseUri(), MASTER_DATA_URI_PREFIX, PREFECTURE_URI_PREFIX);
 
         try {
-            var response = post(url, prefectureIds, new ParameterizedTypeReference<List<PrefectureRes>>() {});
+            var response = post(url, prefectureIds, new ParameterizedTypeReference<List<PrefectureRes>>() {
+            });
             return response.getBody();
         } catch (Exception exception) {
             log.error("Error when call API get prefecture from master data with error #{}", exception.getMessage());
