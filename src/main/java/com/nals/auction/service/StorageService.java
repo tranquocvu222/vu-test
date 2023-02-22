@@ -44,7 +44,7 @@ public class StorageService {
     private final ExceptionHandler exceptionHandler;
     private final Set<String> allowExtensions;
     private final int maxSizeAllow;
-    private final String s3Url;
+    private final String cloudFrontEndpointUrl;
 
     public StorageService(final AmazonS3 amazonS3,
                           final AmazonProperties amazonProperties,
@@ -58,7 +58,7 @@ public class StorageService {
         bucketName = amazonProperties.getS3().getBucketName();
         workingDir = amazonProperties.getS3().getWorkingDir();
         tempDir = amazonProperties.getS3().getTempDir();
-        s3Url = amazonProperties.getS3().getS3Url();
+        cloudFrontEndpointUrl = amazonProperties.getCloudFront().getEndpointUrl();
     }
 
     public void validateFile(final MultipartFile uploadFile)
@@ -139,7 +139,7 @@ public class StorageService {
             return fileName;
         }
 
-        return FileHelper.concatPath(s3Url, "/", workingDir, fileName.trim());
+        return FileHelper.concatPath(cloudFrontEndpointUrl, workingDir, fileName.trim());
     }
 
     public void saveFile(final String fileName) {

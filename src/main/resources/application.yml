@@ -51,4 +51,5 @@ amazon:
     temp-dir: /tmp
     working-dir: /working
     use-iam-role: false
-    s3-url: ${AWS_S3_URL:https://em-project-s3.s3.ap-southeast-1.amazonaws.com}
+  cloud-front:
+    endpoint-url: ${CLOUD_FRONT_URL:https://d333tfjetzbp0s.cloudfront.net}
