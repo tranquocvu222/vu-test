@@ -128,7 +128,8 @@ public class MasterDataClient
 
     public PrefectureRes getPrefectureById(final Long id) {
         log.info("Get prefecture by id #{}", id);
-        var url = String.format("%s/%s/%s", getBaseUri(), PREFECTURE_URI_PREFIX, id.toString());
+        var url = String.format("%s/%s/%s/%s", getBaseUri(), MASTER_DATA_URI_PREFIX,
+                                PREFECTURE_URI_PREFIX, id.toString());
 
         try {
             var response = get(url, PrefectureRes.class);
