@@ -6,6 +6,7 @@ import com.nals.utils.controller.BaseController;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -30,15 +31,29 @@ public class AuctionCrudController
         this.auctionCrudBloc = auctionCrudBloc;
     }
 
+    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('SELLER')")
+    public ResponseEntity<?> getAuctionDetail(@PathVariable final Long id) {
+        return ok(auctionCrudBloc.getAuctionById(id));
+    }
+
     @PostMapping
     @PreAuthorize("hasRole('SELLER')")
     public ResponseEntity<?> createAuction(@Valid @RequestBody final AuctionReq req) {
         return created(auctionCrudBloc.createAuction(req));
     }
 
-    @GetMapping("/{id}")
+    @PutMapping("{id}/publish")
     @PreAuthorize("hasRole('SELLER')")
-    public ResponseEntity<?> getAuctionDetail(@PathVariable final Long id) {
-        return ok(auctionCrudBloc.getAuctionById(id));
+    public ResponseEntity<?> publishAuction(@PathVariable final Long id) {
+        auctionCrudBloc.publishAuction(id);
+        return noContent();
+    }
+
+    @PutMapping("{id}/unpublish")
+    @PreAuthorize("hasRole('SELLER')")
+    public ResponseEntity<?> unpublishAuction(@PathVariable final Long id) {
+        auctionCrudBloc.unpublishAuction(id);
+        return noContent();
     }
 }

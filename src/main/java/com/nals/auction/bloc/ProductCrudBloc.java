@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.time.Instant;
 import java.util.Collection;
@@ -29,6 +30,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.nals.auction.exception.ExceptionHandler.COMPANY_NOT_CREATED;
@@ -65,6 +67,7 @@ import static com.nals.utils.enums.MediaType.PRODUCT_THUMBNAIL;
 public class ProductCrudBloc {
 
     private static final int MAX_IMAGES_UPLOAD = 20;
+    public static final String YEAR_PATTERN = "^(19\\d\\d|[2-9]\\d{3})$";
     private static final Set<MediaType> PRODUCT_MEDIA_TYPES = EnumSet.of(PRODUCT_THUMBNAIL, PRODUCT_IMAGE);
 
     private final ProductService productService;
@@ -255,6 +258,10 @@ public class ProductCrudBloc {
     }
 
     private void validateInspectionDate(final String inspectionDate) {
+        if (StringHelper.isBlank(inspectionDate)) {
+            return;
+        }
+
         try {
             Instant.parse(inspectionDate);
         } catch (Exception exception) {
@@ -307,11 +314,22 @@ public class ProductCrudBloc {
                                          exceptionHandler.getMessageContent(REQUIRED_NOT_BLANK));
         }
 
-        if (!ValidatorHelper.isValidProductionYear(productionYear)) {
+        if (!isValidProductionYear(productionYear)) {
             throw new ValidatorException("production_year",
                                          exceptionHandler.getMessageCode(INVALID_DATA),
                                          exceptionHandler.getMessageContent(INVALID_DATA));
         }
+    }
+
+    //TODO move this to ValidatorHelper in common-utils
+    private boolean isValidProductionYear(final String year) {
+        if (!StringUtils.hasText(year)) {
+            return false;
+        }
+
+        return Pattern.compile(YEAR_PATTERN)
+                      .matcher(year)
+                      .matches();
     }
 
     private void validateProductionArea(final String productionArea) {
