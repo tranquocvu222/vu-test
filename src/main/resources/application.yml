@@ -1,10 +1,9 @@
 server:
-  port: 8083
-
+  port: 8082
 spring:
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}?currentSchema=${DB_SCHEMA}
+    url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}?characterSetResults=UTF-8&serverTimezone=UTC
     username: ${DB_USER}
     password: ${DB_PASS}
     validation-query: SELECT 1
@@ -12,44 +11,17 @@ spring:
       poolName: Hikari
       auto-commit: false
       schema: ${DB_SCHEMA}
+
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQL95Dialect
+    database-platform: org.hibernate.dialect.MySQLDialect
     show-sql: true
     properties:
       hibernate:
         format_sql: false
         default_schema: ${DB_SCHEMA}
     hibernate:
-      ddl-auto: update
-    database: POSTGRESQL
+      ddl-auto: none
 
 #config using by common lib
 error:
   path: classpath:i18n/error_messages
-jhipster:
-  security:
-    authentication:
-      jwt:
-        base64-secret: ${JWT_BASE64_SECRET:QnP/dJWnqc9AYMokt8yPjUqDNSPKk/yS+AFy4D0LZMy2BXAC4uGSXzk2x+P11uly5WYXSRQ5qvDboHXaf+pjyw==}
-
-application:
-  internal-clients:
-    uaa:
-      base-uri: ${UAA_URI:http://localhost:8082/api/v1/auth}
-    master:
-      base-uri: ${MASTER_DATA_URI:http://localhost:8084/api/v1}
-  file-upload:
-    max-size-allow: 10240
-    allow-extensions: png, jpg, jpeg, gif
-
-amazon:
-  access-key: ${AWS_ACCESS_KEY}
-  secret-key: ${AWS_SECRET_KEY}
-  region: ${AWS_REGION}
-  s3:
-    bucket-name: ${AWS_S3_BUCKET_NAME}
-    temp-dir: /tmp
-    working-dir: /working
-    use-iam-role: false
-  cloud-front:
-    endpoint-url: ${CLOUD_FRONT_URL:https://d333tfjetzbp0s.cloudfront.net}

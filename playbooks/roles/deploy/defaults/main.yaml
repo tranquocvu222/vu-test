@@ -1,2 +1,0 @@
----
-application_path: "{{ user_home_folder }}/{{ repos }}"
